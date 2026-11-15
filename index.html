@@ -586,7 +586,10 @@
         </div>
       </div>
 
-      <!-- 11. Этот вечер ты запомнишь надолго! -->
+      <!-- 11. Семья (чистый кадр на 2 секунды) -->
+      <div class="hero-text align-center" id="f-family"></div>
+
+      <!-- 12. Этот вечер ты запомнишь надолго! -->
       <div class="hero-text align-center" id="f-remember">
         <div class="hero-huge-title" style="font-size: clamp(2rem, 7vw, 5rem); line-height: 1.15;">
           Этот вечер ты<br>запомнишь надолго!
@@ -743,7 +746,7 @@
     const isMobile = window.innerWidth <= 768 || (window.innerHeight > window.innerWidth && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
 
     // Media parameters based on device type
-    const TOTAL = isMobile ? 265 : 257;
+    const TOTAL = isMobile ? 266 : 258;
     const FRAMES_DIR = isMobile ? 'mobile_frames' : 'frames';
     const EVENT = new Date('2026-12-12T16:00:00+03:00');
 
@@ -762,7 +765,7 @@
       viewModeBtn.style.display = 'none';
     }
 
-    // 16 Scenes with exact frame target & hold time (in ms)
+    // 17 Scenes with exact frame target & hold time (in ms)
     const scenesConfig = isMobile ? [
       { id: 'f-intro-1', frame: 0, hold: 1000 },             // 1. Чистый собор (статика)
       { id: 'f-intro-2', frame: 25, hold: 1000 },            // 2. Чистый собор (зум)
@@ -775,11 +778,12 @@
       { id: 'f-great-right', frame: 114, hold: 1000 },       // 9. Будет здорово!
       { id: 'f-dont-miss', frame: 127, hold: 1000 },         // 10. Не пропусти!
       { id: 'f-fun', frame: 139, hold: 1000 },               // 11. Тебя ждет супер веселье!
-      { id: 'f-remember', frame: 151, hold: 1000 },          // 12. Этот вечер ты запомнишь...
-      { id: 'f-fasten', frame: 163, hold: 1000 },            // 13. Пристегнись, будет жарко 🔥
-      { id: 'f-countdown-started', frame: 175, hold: 1000 },  // 14. Обратный отсчет... ⏳
-      { id: 'f-details-repeat', frame: 208, hold: 1300 },    // 15. 12.12. 16:00 СПб
-      { id: 'f-confirm-cta', frame: 264, hold: 3000 }        // 16. Подтвердите своё участие
+      { id: 'f-family', frame: 146, hold: 2000 },            // 12. Семья (кадр 147 на 2 секунды)
+      { id: 'f-remember', frame: 152, hold: 1000 },          // 13. Этот вечер ты запомнишь...
+      { id: 'f-fasten', frame: 164, hold: 1000 },            // 14. Пристегнись, будет жарко 🔥
+      { id: 'f-countdown-started', frame: 176, hold: 1000 },  // 15. Обратный отсчет... ⏳
+      { id: 'f-details-repeat', frame: 209, hold: 1300 },    // 16. 12.12. 16:00 СПб
+      { id: 'f-confirm-cta', frame: 265, hold: 3000 }        // 17. Подтвердите своё участие
     ] : [
       { id: 'f-intro-1', frame: 0, hold: 1000 },           // 1. Мои дорогие (кадры 1–21)
       { id: 'f-intro-2', frame: 27, hold: 1000 },          // 2. Приглашаю отметить юбилей (кадры 22–34)
@@ -792,11 +796,12 @@
       { id: 'f-great-right', frame: 114, hold: 1000 },     // 9. Будет здорово!
       { id: 'f-dont-miss', frame: 127, hold: 1000 },       // 10. Не пропусти!
       { id: 'f-fun', frame: 139, hold: 1000 },             // 11. Тебя ждет супер веселье!
-      { id: 'f-remember', frame: 151, hold: 1000 },        // 12. Этот вечер ты запомнишь...
-      { id: 'f-fasten', frame: 163, hold: 1000 },          // 13. Пристегнись, будет жарко 🔥
-      { id: 'f-countdown-started', frame: 175, hold: 1000 }, // 14. Обратный отсчет... ⏳
-      { id: 'f-details-repeat', frame: 200, hold: 1300 },  // 15. 12.12. 16:00 СПб
-      { id: 'f-confirm-cta', frame: 256, hold: 3000 }      // 16. Подтвердите своё участие
+      { id: 'f-family', frame: 146, hold: 2000 },          // 12. Семья (кадр 147 на 2 секунды)
+      { id: 'f-remember', frame: 152, hold: 1000 },        // 13. Этот вечер ты запомнишь...
+      { id: 'f-fasten', frame: 164, hold: 1000 },          // 14. Пристегнись, будет жарко 🔥
+      { id: 'f-countdown-started', frame: 176, hold: 1000 }, // 15. Обратный отсчет... ⏳
+      { id: 'f-details-repeat', frame: 201, hold: 1300 },  // 16. 12.12. 16:00 СПб
+      { id: 'f-confirm-cta', frame: 257, hold: 3000 }      // 17. Подтвердите своё участие
     ];
 
     const scenes = scenesConfig.map((s, idx) => ({ ...s, index: idx, el: document.getElementById(s.id) }));
