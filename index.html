@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Приглашение на юбилей — 30 лет!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0b14;
+      --card: rgba(22, 22, 38, 0.94);
+      --gold: #dfb15b;
+      --gold-l: #f5cf7c;
+      --gold-dark: #b88a35;
+      --txt: #f5f0eb;
+      --muted: #a49fad;
+      --display: 'Playfair Display', Georgia, serif;
+      --body: 'Montserrat', 'Segoe UI', sans-serif;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--txt);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Loader ── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999; background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity .8s, visibility .8s;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    #loader h2 {
+      font-family: var(--display); color: var(--gold); font-size: 1.3rem;
+      margin-bottom: 1.5rem; text-align: center; padding: 0 1rem;
+    }
+    .loader-bar { width: min(220px, 65vw); height: 3px; background: rgba(223, 177, 91, .2); border-radius: 3px; overflow: hidden; }
+    .loader-bar-fill { height: 100%; background: var(--gold); width: 0%; border-radius: 3px; transition: width .1s linear; }
+    #loader-percent { margin-top: .75rem; font-size: .85rem; color: var(--muted); }
+
+    /* ── Top Bar (Stories Progress + Action Controls) ── */
+    #top-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 600;
+      padding: max(0.6rem, env(safe-area-inset-top, 0.6rem)) 1rem 0.5rem;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(11, 11, 20, 0.85) 0%, rgba(11, 11, 20, 0.4) 65%, transparent 100%);
+      transition: opacity 0.3s;
+    }
+    #top-nav > * { pointer-events: auto; }
+
+    /* Instagram-Stories Progress Bar */
+    #story-progress {
+      display: flex; gap: 4px; width: 100%; max-width: 800px; margin: 0 auto 0.7rem;
+    }
+    .prog-seg {
+      flex: 1; height: 3px; background: rgba(255, 255, 255, 0.22); border-radius: 3px;
+      overflow: hidden; cursor: pointer; transition: background 0.2s;
+    }
+    .prog-seg-fill {
+      height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--gold-l));
+      border-radius: 3px;
+    }
+    .prog-seg.active .prog-seg-fill { transition: width 0.1s linear; }
+    .prog-seg.completed .prog-seg-fill { width: 100% !important; }
+
+    /* Top Action Buttons */
+    .top-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 900px; margin: 0 auto;
+    }
+    .top-pill-btn {
+      padding: .45rem 1rem; border-radius: 50px;
+      border: 1px solid rgba(223, 177, 91, .45); background: rgba(11, 11, 20, .82);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      color: var(--gold); font-family: var(--body); font-size: .78rem; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: .35rem;
+      transition: all .25s; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .top-pill-btn:active {
+      background: rgba(223, 177, 91, .2); transform: scale(0.96);
+    }
+
+    /* Pause Status Pill */
+    #pause-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.35rem 0.8rem; border-radius: 50px;
+      background: rgba(223, 177, 91, 0.2); border: 1px solid rgba(223, 177, 91, 0.4);
+      color: var(--gold-l); font-size: 0.72rem; font-weight: 600;
+      opacity: 0; visibility: hidden; transition: all 0.25s;
+    }
+    #pause-badge.show { opacity: 1; visibility: visible; }
+
+    /* ── Details Overlay ── */
+    #overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(7, 7, 14, .94);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; transition: opacity .35s, visibility .35s;
+      padding: 1rem;
+    }
+    #overlay.open { opacity: 1; visibility: visible; }
+    .overlay-content {
+      background: var(--card);
+      border: 1px solid rgba(223, 177, 91, .25);
+      border-radius: 22px;
+      padding: 2.2rem 1.8rem;
+      max-width: 480px; width: 100%; position: relative;
+      max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+    }
+    .overlay-close {
+      position: absolute; top: 1.1rem; right: 1.1rem; background: none; border: none;
+      color: var(--muted); font-size: 1.6rem; cursor: pointer; padding: .3rem;
+      line-height: 1; -webkit-tap-highlight-color: transparent; transition: color .2s;
+    }
+    .overlay-close:hover { color: var(--gold); }
+    .overlay-content h2 {
+      font-family: var(--display); color: var(--gold); font-size: 1.6rem;
+      text-align: center; margin-bottom: 1.6rem;
+    }
+    .detail-row {
+      display: flex; gap: 1rem; align-items: flex-start;
+      margin-bottom: 1.1rem; padding-bottom: 1.1rem;
+      border-bottom: 1px solid rgba(223, 177, 91, .09);
+    }
+    .detail-row:last-of-type { border-bottom: none; margin-bottom: 0; }
+    .detail-row .d-icon { font-size: 1.5rem; flex-shrink: 0; width: 2.2rem; text-align: center; }
+    .detail-row .d-info h3 { font-family: var(--display); color: var(--gold); font-size: 1.05rem; margin-bottom: .2rem; }
+    .detail-row .d-info p { color: var(--muted); font-size: .9rem; line-height: 1.45; font-weight: 300; }
+    .overlay-map-btn {
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      width: 100%; margin-top: 1.6rem; padding: .95rem; border-radius: 50px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-l));
+      color: #0b0b14;
+      font-family: var(--body); font-size: .95rem; font-weight: 700; text-decoration: none;
+      transition: all .3s; -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 6px 25px rgba(223, 177, 91, .25);
+    }
+
+    /* ── Hero Cinema Stage (No Scroll required) ── */
+    #hero-stage {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background: #000;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    #hero-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Interactive Tap Zones (Previous / Pause / Next) */
+    .tap-zone {
+      position: absolute; top: 0; bottom: 0; z-index: 20;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tap-zone-left { left: 0; width: 30%; }
+    .tap-zone-center { left: 30%; width: 40%; }
+    .tap-zone-right { right: 0; width: 30%; }
+
+    /* Scene Texts Overlay */
+    .hero-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 25;
+      padding: 1rem 1.5rem;
+      box-sizing: border-box;
+    }
+
+    .hero-text {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0.94);
+      width: 100%;
+      max-width: 1200px;
+      box-sizing: border-box;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+    .hero-text.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Alignments */
+    .hero-text.align-center { text-align: center; padding: 0 1rem; }
+    .hero-text.align-left {
+      text-align: left;
+      padding-left: clamp(1.4rem, 7vw, 6rem);
+      padding-right: 1.4rem;
+    }
+    .hero-text.align-right {
+      text-align: right;
+      padding-right: clamp(1.4rem, 7vw, 6rem);
+      padding-left: 1.4rem;
+    }
+
+    /* Golden Antique Typography */
+    .intro-sub {
+      font-family: var(--body);
+      font-size: clamp(1.15rem, 3.4vw, 2.2rem);
+      font-weight: 300;
+      color: #f5f0eb;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.8rem;
+      text-shadow: 0 2px 15px rgba(0,0,0,0.9);
+    }
+    .intro-line {
+      font-family: var(--display);
+      font-weight: 700;
+      color: var(--gold);
+      font-size: clamp(2.7rem, 9.5vw, 7rem);
+      line-height: 1.04;
+      letter-spacing: -0.01em;
+      text-shadow: 0 4px 25px rgba(0,0,0,0.9), 0 0 50px rgba(223, 177, 91, 0.4);
+    }
+    .hero-huge-title {
+      font-family: var(--display);
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.05;
+      text-shadow: 0 4px 25px rgba(0,0,0,0.9), 0 0 50px rgba(223, 177, 91, 0.4);
+      font-size: clamp(2.5rem, 8.8vw, 6.2rem);
+    }
+    .hero-giant-number {
+      font-family: var(--display);
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 0.95;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.9), 0 0 60px rgba(223, 177, 91, 0.5);
+      font-size: clamp(4.4rem, 17vw, 11rem);
+      display: inline-block;
+    }
+    .hero-sub-line {
+      font-family: var(--display);
+      color: var(--gold);
+      font-size: clamp(1.7rem, 5.8vw, 3.8rem);
+      line-height: 1.15;
+      text-shadow: 0 3px 20px rgba(0,0,0,0.9);
+    }
+
+    /* Countdown */
+    .hero-countdown {
+      display: flex; justify-content: center;
+      gap: clamp(0.5rem, 2vw, 1.2rem); margin-top: 1rem;
+    }
+    .hero-cd-item {
+      background: rgba(11, 11, 20, 0.85);
+      border: 1.5px solid rgba(223, 177, 91, 0.4);
+      border-radius: 14px;
+      padding: clamp(0.6rem, 2vw, 1.1rem) clamp(0.6rem, 2.2vw, 1.4rem);
+      min-width: clamp(65px, 16vw, 105px);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+    .hero-cd-item .cd-num {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 5.5vw, 3.4rem);
+      color: var(--gold);
+      line-height: 1; font-weight: 700;
+    }
+    .hero-cd-item .cd-label {
+      font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em;
+      margin-top: 0.3rem;
+    }
+
+    /* ── START BUTTON (Prominent on Scene 1) ── */
+    #start-btn-wrap {
+      position: absolute; bottom: max(2.5rem, env(safe-area-inset-bottom, 2.5rem));
+      left: 50%; transform: translateX(-50%);
+      z-index: 35; pointer-events: auto;
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    #start-btn-wrap.hidden {
+      opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px);
+    }
+    .btn-start-story {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.65rem;
+      padding: 1.05rem 2.2rem; border-radius: 50px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-l));
+      color: #0b0b14; border: none; cursor: pointer;
+      font-family: var(--body); font-size: 1.05rem; font-weight: 700; letter-spacing: 0.02em;
+      box-shadow: 0 8px 35px rgba(223, 177, 91, 0.5), 0 0 20px rgba(223, 177, 91, 0.3);
+      animation: pulse-gold-btn 2.2s infinite ease-in-out;
+      -webkit-tap-highlight-color: transparent; transition: all 0.25s;
+    }
+    .btn-start-story:active {
+      transform: scale(0.96); box-shadow: 0 4px 20px rgba(223, 177, 91, 0.4);
+    }
+    @keyframes pulse-gold-btn {
+      0%, 100% { box-shadow: 0 8px 30px rgba(223, 177, 91, 0.45); }
+      50% { box-shadow: 0 10px 45px rgba(223, 177, 91, 0.75), 0 0 25px rgba(245, 207, 124, 0.5); }
+    }
+
+    /* Final Screen CTA Buttons */
+    .final-actions-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+      margin-top: 1.6rem; pointer-events: auto;
+    }
+    .btn-to-rsvp {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.95rem 2rem; border-radius: 50px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-l));
+      color: #0b0b14; border: none; cursor: pointer;
+      font-family: var(--body); font-size: 0.95rem; font-weight: 700;
+      text-decoration: none; box-shadow: 0 8px 30px rgba(223, 177, 91, 0.4);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-replay {
+      background: rgba(11, 11, 20, 0.75);
+      border: 1px solid rgba(223, 177, 91, 0.45);
+      color: var(--gold); border-radius: 50px; padding: 0.6rem 1.4rem;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      backdrop-filter: blur(10px); -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Form Section ── */
+    .section-form {
+      position: relative; z-index: 10; padding: 3rem 1rem 4rem;
+      max-width: 560px; margin: 0 auto; background: var(--bg);
+    }
+    .section-form .section-title {
+      font-family: var(--display); font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+      color: var(--gold); text-align: center; margin-bottom: .4rem;
+    }
+    .section-form .section-sub {
+      text-align: center; color: var(--muted); font-weight: 300; margin-bottom: 2rem;
+      font-size: clamp(.85rem, 2vw, 1rem);
+    }
+    .form-card {
+      background: var(--card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(223, 177, 91, .2); border-radius: 20px; padding: 2.2rem 1.6rem;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    }
+    .fg { margin-bottom: 1.3rem; }
+    .fg label { display: block; font-size: .84rem; font-weight: 600; color: var(--gold); margin-bottom: .45rem; letter-spacing: .04em; }
+    .fg input[type="text"], .fg textarea {
+      width: 100%; padding: .82rem .95rem; border: 1px solid rgba(223, 177, 91, .25);
+      border-radius: 10px; background: rgba(11, 11, 20, .85); color: var(--txt);
+      font-family: var(--body); font-size: 16px; outline: none; transition: border-color .3s;
+    }
+    .fg input:focus, .fg textarea:focus { border-color: var(--gold); }
+    .fg input::placeholder, .fg textarea::placeholder { color: var(--muted); opacity: .45; }
+    .fg textarea { resize: vertical; min-height: 85px; }
+
+    /* Attend radio */
+    .attend-row { display: flex; gap: .6rem; }
+    .attend-opt { flex: 1; }
+    .attend-opt input { display: none; }
+    .attend-opt label {
+      display: flex; align-items: center; justify-content: center; gap: .4rem;
+      padding: .78rem .4rem; border: 1.5px solid rgba(223, 177, 91, .22); border-radius: 10px;
+      text-align: center; cursor: pointer; font-size: clamp(.82rem, 2vw, .92rem); font-weight: 500;
+      color: var(--muted); transition: all .3s; -webkit-tap-highlight-color: transparent;
+    }
+    .attend-opt input:checked + label {
+      border-color: var(--gold); background: rgba(223, 177, 91, .12); color: var(--gold);
+    }
+    /* Checkbox - пара */
+    .check-row {
+      display: flex; align-items: center; gap: .7rem; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; padding: .2rem 0;
+    }
+    .check-row input[type="checkbox"] { display: none; }
+    .check-box {
+      width: 24px; height: 24px; border: 1.5px solid rgba(223, 177, 91, .35); border-radius: 6px;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all .3s; background: rgba(11, 11, 20, .85);
+    }
+    .check-box::after { content: '✓'; color: var(--gold); font-size: .95rem; font-weight: 700; opacity: 0; transition: opacity .2s; }
+    .check-row input:checked ~ .check-box { border-color: var(--gold); background: rgba(223, 177, 91, .15); }
+    .check-row input:checked ~ .check-box::after { opacity: 1; }
+    .check-row .check-label { font-size: .92rem; color: var(--txt); font-weight: 400; }
+
+    /* Alcohol grid */
+    .alcohol-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; }
+    .alc-opt input { display: none; }
+    .alc-opt label {
+      display: block; padding: .65rem .35rem; border: 1.5px solid rgba(223, 177, 91, .18);
+      border-radius: 9px; text-align: center; cursor: pointer;
+      font-size: clamp(.72rem, 1.8vw, .84rem); color: var(--muted); transition: all .25s;
+      -webkit-tap-highlight-color: transparent; line-height: 1.35;
+    }
+    .alc-opt input:checked + label {
+      border-color: var(--gold); background: rgba(223, 177, 91, .12); color: var(--gold);
+    }
+    /* Submit */
+    .form-submit { text-align: center; margin-top: 1.6rem; }
+    .btn-submit {
+      width: 100%; padding: .95rem; border-radius: 50px; border: none;
+      background: linear-gradient(135deg, var(--gold), var(--gold-l));
+      color: #0b0b14;
+      font-family: var(--body); font-size: 1.05rem; font-weight: 700; cursor: pointer;
+      transition: all .3s; -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 6px 25px rgba(223, 177, 91, .3);
+    }
+    .form-success { display: none; text-align: center; padding: 2.5rem 1rem; }
+    .form-success .check { font-size: 3.2rem; margin-bottom: .8rem; }
+    .form-success h3 { font-family: var(--display); color: var(--gold); font-size: 1.5rem; margin-bottom: .35rem; }
+    .form-success p { color: var(--muted); font-size: .92rem; }
+
+    footer {
+      text-align: center; padding: 2.5rem 1rem;
+      padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid rgba(223, 177, 91, .1);
+    }
+    footer p { color: var(--muted); font-size: .82rem; font-weight: 300; }
+    footer .heart { color: var(--gold); }
+
+    @media (max-width: 768px) {
+      .alcohol-grid { grid-template-columns: repeat(2, 1fr); }
+      .overlay-content { padding: 2rem 1.3rem; border-radius: 18px; }
+      .section-form { padding: 2.5rem 1rem 3.5rem; }
+      .form-card { padding: 1.6rem 1.2rem; border-radius: 16px; }
+    }
+    @media (max-width: 380px) {
+      .attend-row { flex-direction: column; gap: .4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loader -->
+  <div id="loader">
+    <h2>✨ Загружаем приглашение…</h2>
+    <div class="loader-bar"><div class="loader-bar-fill" id="loader-fill"></div></div>
+    <div id="loader-percent">0%</div>
+  </div>
+
+  <!-- Top Bar with Story Progress and Controls -->
+  <div id="top-nav">
+    <div id="story-progress"></div>
+    <div class="top-actions">
+      <button class="top-pill-btn" onclick="toggleOverlay()">📋 К деталям</button>
+      <div id="pause-badge">⏸ Пауза</div>
+      <button class="top-pill-btn" id="view-mode-btn" onclick="toggleViewMode()">⛶ Заполнить</button>
+    </div>
+  </div>
+
+  <!-- ═══ Details Overlay ═══ -->
+  <div id="overlay" onclick="if(event.target===this)toggleOverlay()">
+    <div class="overlay-content">
+      <button class="overlay-close" onclick="toggleOverlay()">✕</button>
+      <h2>📌 Детали праздника</h2>
+
+      <div class="detail-row">
+        <div class="d-icon">📅</div>
+        <div class="d-info">
+          <h3>Дата</h3>
+          <p>12 декабря 2026, суббота</p>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="d-icon">⏰</div>
+        <div class="d-info">
+          <h3>Начало</h3>
+          <p>16:00 — сбор гостей</p>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="d-icon">📍</div>
+        <div class="d-info">
+          <h3>Место</h3>
+          <p>Санкт-Петербург,<br>Кожевенная линия, 34</p>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="d-icon">👔</div>
+        <div class="d-info">
+          <h3>Дресс-код</h3>
+          <p>Smart Casual — элегантно, но комфортно</p>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="d-icon">🎁</div>
+        <div class="d-info">
+          <h3>Подарки</h3>
+          <p>Лучший подарок — ваше присутствие!</p>
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="d-icon">🎶</div>
+        <div class="d-info">
+          <h3>Программа</h3>
+          <p>Живая музыка, танцы, сюрпризы</p>
+        </div>
+      </div>
+
+      <a href="https://yandex.ru/maps/?pt=30.236617,59.920962&z=16&l=map&text=Санкт-Петербург,+Кожевенная+линия,+34" target="_blank" rel="noopener" class="overlay-map-btn">
+        🗺️ Открыть в Яндекс.Картах
+      </a>
+    </div>
+  </div>
+
+  <!-- ═══ Hero Cinema Stage (No Scroll Story) ═══ -->
+  <section id="hero-stage">
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Tap zones for Stories interaction -->
+    <div class="tap-zone tap-zone-left" id="tap-prev" title="Предыдущая сцена"></div>
+    <div class="tap-zone tap-zone-center" id="tap-pause" title="Пауза / Продолжить"></div>
+    <div class="tap-zone tap-zone-right" id="tap-next" title="Следующая сцена"></div>
+
+    <div class="hero-overlay" id="hero-overlay">
+
+      <!-- 1. Сцена 1 (кадры 1–21): без текста -->
+      <div class="hero-text align-center active" id="f-intro-1"></div>
+
+      <!-- 2. Сцена 2 (кадры 22–34): без текста -->
+      <div class="hero-text align-center" id="f-intro-2"></div>
+
+      <!-- 2. Незабываемый вечер -->
+      <div class="hero-text align-center" id="f-unforgettable">
+        <div class="hero-huge-title">Незабываемый<br>вечер</div>
+      </div>
+
+      <!-- 3. 12.12 жирным шрифтом слева -->
+      <div class="hero-text align-left" id="f-date-left">
+        <div class="hero-giant-number">12.12</div>
+      </div>
+
+      <!-- 4. Время начала 16.00 справа -->
+      <div class="hero-text align-right" id="f-time-right">
+        <div class="hero-sub-line">Время начала</div>
+        <div class="hero-huge-title" style="font-size: clamp(3rem, 11vw, 7.5rem);">16.00</div>
+      </div>
+
+      <!-- 5. Санкт-Петербург, Кожевенная линия, 34 слева -->
+      <div class="hero-text align-left" id="f-place-left">
+        <div class="hero-huge-title" style="font-size: clamp(2rem, 6.8vw, 4.8rem); line-height: 1.15;">
+          Санкт-Петербург,<br>Кожевенная линия, 34
+        </div>
+      </div>
+
+      <!-- 6. по центру Таймер Осталось -->
+      <div class="hero-text align-center" id="f-timer">
+        <div class="hero-huge-title" style="margin-bottom: 0.8rem; font-size: clamp(2.2rem, 7.5vw, 5rem);">Осталось</div>
+        <div class="hero-countdown">
+          <div class="hero-cd-item"><div class="cd-num" id="hero-cd-d">--</div><div class="cd-label">дней</div></div>
+          <div class="hero-cd-item"><div class="cd-num" id="hero-cd-h">--</div><div class="cd-label">часов</div></div>
+          <div class="hero-cd-item"><div class="cd-num" id="hero-cd-m">--</div><div class="cd-label">минут</div></div>
+          <div class="hero-cd-item"><div class="cd-num" id="hero-cd-s">--</div><div class="cd-label">секунд</div></div>
+        </div>
+      </div>
+
+      <!-- 7. Жду тебя! слева -->
+      <div class="hero-text align-left" id="f-wait-left">
+        <div class="hero-huge-title" style="font-size: clamp(3rem, 12vw, 8rem);">Жду тебя!</div>
+      </div>
+
+      <!-- 8. Будет здорово! справа -->
+      <div class="hero-text align-right" id="f-great-right">
+        <div class="hero-huge-title" style="font-size: clamp(2.8rem, 10.5vw, 7.2rem);">Будет здорово!</div>
+      </div>
+
+      <!-- 9. Не пропусти! -->
+      <div class="hero-text align-center" id="f-dont-miss">
+        <div class="hero-huge-title" style="font-size: clamp(3.2rem, 12vw, 8.5rem);">Не пропусти!</div>
+      </div>
+
+      <!-- 10. Тебя ждет супер веселье! -->
+      <div class="hero-text align-center" id="f-fun">
+        <div class="hero-huge-title" style="font-size: clamp(2.2rem, 7.5vw, 5.5rem); line-height: 1.15;">
+          Тебя ждет<br>супер веселье!
+        </div>
+      </div>
+
+      <!-- 11. Этот вечер ты запомнишь надолго! -->
+      <div class="hero-text align-center" id="f-remember">
+        <div class="hero-huge-title" style="font-size: clamp(2rem, 7vw, 5rem); line-height: 1.15;">
+          Этот вечер ты<br>запомнишь надолго!
+        </div>
+      </div>
+
+      <!-- 12. Пристегнись, будет жарко -->
+      <div class="hero-text align-center" id="f-fasten">
+        <div class="hero-huge-title" style="font-size: clamp(2.4rem, 8vw, 5.8rem); line-height: 1.15;">
+          Пристегнись,<br>будет жарко 🔥
+        </div>
+      </div>
+
+      <!-- 13. Обратный отсчет уже пошел -->
+      <div class="hero-text align-center" id="f-countdown-started">
+        <div class="hero-huge-title" style="font-size: clamp(2.2rem, 7.5vw, 5.2rem); line-height: 1.15;">
+          Обратный отсчет<br>уже пошел ⏳
+        </div>
+      </div>
+
+      <!-- 14. 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34 -->
+      <div class="hero-text align-center" id="f-details-repeat">
+        <div class="hero-giant-number" style="font-size: clamp(3.2rem, 11vw, 7.5rem); margin-bottom: 0.1rem;">12.12</div>
+        <div class="hero-sub-line" style="font-size: clamp(1.8rem, 6vw, 3.8rem); margin-bottom: 0.4rem;">Начало в 16:00</div>
+        <div class="hero-sub-line" style="font-size: clamp(1.3rem, 4.2vw, 2.6rem); color: #f5f0eb; font-weight: 400; line-height: 1.3;">
+          Санкт-Петербург,<br>Кожевенная линия, 34
+        </div>
+      </div>
+
+      <!-- 15. Финал: Пожалуйста, подтвердите своё участие -->
+      <div class="hero-text align-center" id="f-confirm-cta">
+        <div class="hero-huge-title" style="font-size: clamp(2rem, 6.8vw, 4.6rem); line-height: 1.18;">
+          Пожалуйста,<br>подтвердите<br>своё участие
+        </div>
+        <div class="final-actions-wrap">
+          <a href="#rsvp" class="btn-to-rsvp" onclick="document.getElementById('rsvp').scrollIntoView({behavior:'smooth'}); return false;">
+            ✍️ Заполнить анкету
+          </a>
+          <button class="btn-replay" onclick="replayStory()">
+            ↺ Смотреть сначала
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- START BUTTON ON SCREEN 1 -->
+    <div id="start-btn-wrap">
+      <button class="btn-start-story" id="start-story-btn" onclick="startStory()">
+        <span>▶</span>
+        <span>Смотреть приглашение</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ═══ RSVP Form ═══ -->
+  <section class="section-form" id="rsvp">
+    <div>
+      <h2 class="section-title">Анкета гостя</h2>
+      <p class="section-sub">Заполните, пожалуйста — мне это важно 💛</p>
+    </div>
+
+    <div class="form-card">
+      <form id="rsvp-form">
+        <!-- Имя Фамилия -->
+        <div class="fg">
+          <label>Имя и Фамилия ✨</label>
+          <input type="text" name="name" placeholder="Как вас зовут?" required autocomplete="name">
+        </div>
+
+        <!-- Придёшь? -->
+        <div class="fg">
+          <label>Сможете прийти? 🤔</label>
+          <div class="attend-row">
+            <div class="attend-opt">
+              <input type="radio" id="a-yes" name="attend" value="yes" required>
+              <label for="a-yes">🎉 Да, приду!</label>
+            </div>
+            <div class="attend-opt">
+              <input type="radio" id="a-no" name="attend" value="no">
+              <label for="a-no">😢 Не смогу</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- С парой -->
+        <div class="fg">
+          <label class="check-row" for="with-pair">
+            <input type="checkbox" id="with-pair" name="with_pair" value="yes">
+            <div class="check-box"></div>
+            <span class="check-label">Буду с парой 💑</span>
+          </label>
+        </div>
+
+        <!-- Алкоголь -->
+        <div class="fg">
+          <label>Что будете пить? 🥂</label>
+          <div class="alcohol-grid">
+            <div class="alc-opt">
+              <input type="radio" id="dr-0" name="drink" value="none">
+              <label for="dr-0">🚫<br>Выпивать не буду</label>
+            </div>
+            <div class="alc-opt">
+              <input type="radio" id="dr-1" name="drink" value="vodka">
+              <label for="dr-1">🥃<br>Водка</label>
+            </div>
+            <div class="alc-opt">
+              <input type="radio" id="dr-2" name="drink" value="whisky">
+              <label for="dr-2">🥃<br>Виски</label>
+            </div>
+            <div class="alc-opt">
+              <input type="radio" id="dr-3" name="drink" value="wine">
+              <label for="dr-3">🍷<br>Вино</label>
+            </div>
+            <div class="alc-opt">
+              <input type="radio" id="dr-4" name="drink" value="champagne">
+              <label for="dr-4">🍾<br>Шампанское</label>
+            </div>
+            <div class="alc-opt">
+              <input type="radio" id="dr-5" name="drink" value="anything" checked>
+              <label for="dr-5">🍹<br>Все что нальют</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Пожелания -->
+        <div class="fg">
+          <label>Пожелания 💬</label>
+          <textarea name="wishes" placeholder="Напишите что-нибудь тёплое..."></textarea>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn-submit">Отправить ответ 💌</button>
+        </div>
+      </form>
+
+      <div class="form-success" id="form-success">
+        <div class="check">🎊</div>
+        <h3>Спасибо!</h3>
+        <p>Ваш ответ записан. Ждём вас на празднике!</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Сделано с <span class="heart">♥</span> для самого лучшего юбилея</p>
+  </footer>
+
+  <script>
+  (() => {
+    'use strict';
+
+    const TOTAL = 257; // 25 fps full HD original animation
+    const EVENT = new Date('2026-12-12T16:00:00+03:00');
+
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    const loader = document.getElementById('loader');
+    const loaderFill = document.getElementById('loader-fill');
+    const loaderPct = document.getElementById('loader-percent');
+    const startBtnWrap = document.getElementById('start-btn-wrap');
+    const viewModeBtn = document.getElementById('view-mode-btn');
+    const pauseBadge = document.getElementById('pause-badge');
+    const storyProgressCont = document.getElementById('story-progress');
+
+    // 16 Scenes with exact frame target & hold time (in ms)
+    const scenes = [
+      { id: 'f-intro-1', frame: 0, hold: 1000 },           // 1. Мои дорогие (кадры 1–21)
+      { id: 'f-intro-2', frame: 27, hold: 1000 },          // 2. Приглашаю отметить юбилей (кадры 22–34)
+      { id: 'f-unforgettable', frame: 42, hold: 1000 },    // 3. Незабываемый вечер
+      { id: 'f-date-left', frame: 55, hold: 1000 },        // 3. 12.12
+      { id: 'f-time-right', frame: 67, hold: 1000 },       // 4. Время начала 16.00
+      { id: 'f-place-left', frame: 78, hold: 1200 },       // 5. Санкт-Петербург...
+      { id: 'f-timer', frame: 91, hold: 1000 },            // 6. Таймер Осталось
+      { id: 'f-wait-left', frame: 103, hold: 1000 },       // 7. Жду тебя!
+      { id: 'f-great-right', frame: 114, hold: 1000 },     // 8. Будет здорово!
+      { id: 'f-dont-miss', frame: 127, hold: 1000 },       // 9. Не пропусти!
+      { id: 'f-fun', frame: 139, hold: 1000 },             // 10. Тебя ждет супер веселье!
+      { id: 'f-remember', frame: 151, hold: 1000 },        // 11. Этот вечер ты запомнишь...
+      { id: 'f-fasten', frame: 163, hold: 1000 },          // 12. Пристегнись, будет жарко 🔥
+      { id: 'f-countdown-started', frame: 175, hold: 1000 }, // 13. Обратный отсчет... ⏳
+      { id: 'f-details-repeat', frame: 200, hold: 1300 },  // 14. 12.12. 16:00 СПб
+      { id: 'f-confirm-cta', frame: 256, hold: 3000 }      // 15. Подтвердите своё участие
+    ].map((s, idx) => ({ ...s, index: idx, el: document.getElementById(s.id) }));
+
+    const frames = [];
+    let loaded = 0, ready = false;
+
+    // View Mode: 'fit' (100% full uncropped panorama with ambient background) vs 'cover' (fills screen)
+    // Default to 'fit' on mobile portrait so the whole architecture and panorama is visible without cropping!
+    let viewMode = 'fit';
+
+    // Playback state
+    let currentF = 0;       // Float current frame index (0..256)
+    let currentSceneIdx = 0;
+    let isPlaying = false;
+    let isPaused = false;
+    let animReq = null;
+
+    // Progress Bar Segments
+    const segEls = [];
+    function buildProgressBar() {
+      storyProgressCont.innerHTML = '';
+      scenes.forEach((s, idx) => {
+        const seg = document.createElement('div');
+        seg.className = 'prog-seg';
+        seg.innerHTML = '<div class="prog-seg-fill"></div>';
+        seg.addEventListener('click', (e) => {
+          e.stopPropagation();
+          jumpToScene(idx);
+        });
+        storyProgressCont.appendChild(seg);
+        segEls.push(seg);
+      });
+      updateProgressBar(0, 0);
+    }
+
+    function updateProgressBar(sceneIdx, sceneProgress) {
+      segEls.forEach((seg, idx) => {
+        const fill = seg.querySelector('.prog-seg-fill');
+        if (idx < sceneIdx) {
+          seg.className = 'prog-seg completed';
+          fill.style.width = '100%';
+        } else if (idx === sceneIdx) {
+          seg.className = 'prog-seg active';
+          fill.style.width = (Math.min(Math.max(sceneProgress, 0), 1) * 100) + '%';
+        } else {
+          seg.className = 'prog-seg';
+          fill.style.width = '0%';
+        }
+      });
+    }
+
+    // Toggle Fit/Cover View Mode
+    window.toggleViewMode = function() {
+      viewMode = viewMode === 'fit' ? 'cover' : 'fit';
+      viewModeBtn.textContent = viewMode === 'fit' ? '⛶ Заполнить' : '▣ Вписать';
+      if (ready) drawParallaxFrame(currentF);
+    };
+
+    function pad(n) { return String(n).padStart(3, '0'); }
+
+    function preload() {
+      return new Promise(resolve => {
+        for (let i = 1; i <= TOTAL; i++) {
+          const img = new Image();
+          img.onload = img.onerror = () => {
+            loaded++;
+            const p = Math.round(loaded / TOTAL * 100);
+            loaderFill.style.width = p + '%';
+            loaderPct.textContent = p + '%';
+            if (loaded === TOTAL) resolve();
+          };
+          img.src = `frames/frame_${pad(i)}.jpg`;
+          frames[i - 1] = img;
+        }
+      });
+    }
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      if (ready) drawParallaxFrame(currentF);
+    }
+
+    // ── High Quality Frame Drawing (Fit + Ambient Glow OR Cover) ──
+    function drawParallaxFrame(fFloat) {
+      const fi = Math.min(Math.max(fFloat, 0), TOTAL - 1);
+      const baseIdx = Math.floor(fi);
+      const nextIdx = Math.min(baseIdx + 1, TOTAL - 1);
+      const alpha = fi - baseIdx;
+
+      const img1 = frames[baseIdx];
+      const img2 = frames[nextIdx];
+      if (!img1 || !img1.naturalWidth) return;
+
+      const cw = canvas.width;
+      const ch = canvas.height;
+      const sWidth = img1.naturalWidth || 1920;
+      const sHeight = img1.naturalHeight || 960;
+      const imgRatio = sWidth / sHeight;
+
+      ctx.clearRect(0, 0, cw, ch);
+
+      if (viewMode === 'fit') {
+        // ── Fit Mode: 100% of the image is shown without cutting edges! ──
+        // Ambient background glow (fills screen with sunset mood)
+        ctx.save();
+        ctx.filter = 'blur(28px) brightness(0.6)';
+        const bgScale = Math.max(cw / sWidth, ch / sHeight);
+        const bgW = sWidth * bgScale;
+        const bgH = sHeight * bgScale;
+        ctx.drawImage(img1, (cw - bgW) / 2, (ch - bgH) / 2, bgW, bgH);
+        ctx.restore();
+
+        // Foreground sharp full original picture
+        const fgScale = Math.min(cw / sWidth, ch / sHeight);
+        const fgW = sWidth * fgScale;
+        const fgH = sHeight * fgScale;
+        const fgX = (cw - fgW) / 2;
+        const fgY = (ch - fgH) / 2;
+
+        ctx.drawImage(img1, fgX, fgY, fgW, fgH);
+
+        if (alpha > 0.01 && nextIdx !== baseIdx && img2 && img2.naturalWidth) {
+          ctx.globalAlpha = alpha;
+          ctx.drawImage(img2, fgX, fgY, fgW, fgH);
+          ctx.globalAlpha = 1.0;
+        }
+      } else {
+        // ── Cover Mode: Fills screen edge-to-edge ──
+        const scale = Math.max(cw / sWidth, ch / sHeight);
+        const drawW = sWidth * scale;
+        const drawH = sHeight * scale;
+        const offsetX = (cw - drawW) / 2;
+        const offsetY = (ch - drawH) / 2;
+
+        ctx.drawImage(img1, offsetX, offsetY, drawW, drawH);
+
+        if (alpha > 0.01 && nextIdx !== baseIdx && img2 && img2.naturalWidth) {
+          ctx.globalAlpha = alpha;
+          ctx.drawImage(img2, offsetX, offsetY, drawW, drawH);
+          ctx.globalAlpha = 1.0;
+        }
+      }
+    }
+
+    // ── Active Scene Text Switcher ──
+    function showSceneText(idx) {
+      scenes.forEach((s, i) => {
+        if (!s.el) return;
+        if (i === idx) {
+          s.el.classList.add('active');
+        } else {
+          s.el.classList.remove('active');
+        }
+      });
+    }
+
+    // ── Playback Engine: Automatic story progression with 1s scene holds ──
+    let abortController = null;
+
+    function sleep(ms, signal) {
+      return new Promise((resolve, reject) => {
+        let timer = null;
+        let pausedTimeRemaining = ms;
+        let startTime = Date.now();
+
+        const tick = () => {
+          if (signal && signal.aborted) {
+            clearTimeout(timer);
+            reject(new Error('aborted'));
+            return;
+          }
+          if (isPaused) {
+            pausedTimeRemaining -= (Date.now() - startTime);
+            // Poll while paused
+            timer = setTimeout(waitResume, 100);
+            return;
+          }
+          resolve();
+        };
+
+        const waitResume = () => {
+          if (signal && signal.aborted) {
+            reject(new Error('aborted'));
+            return;
+          }
+          if (!isPaused) {
+            startTime = Date.now();
+            timer = setTimeout(tick, Math.max(0, pausedTimeRemaining));
+          } else {
+            timer = setTimeout(waitResume, 100);
+          }
+        };
+
+        timer = setTimeout(tick, ms);
+      });
+    }
+
+    // Ease in-out quad for cinematic transition between frames
+    function easeInOutQuad(t) {
+      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+
+    async function animateFrames(fromF, toF, durationMs, signal) {
+      const startTime = performance.now();
+      let pauseAccum = 0;
+      let lastPauseStart = 0;
+
+      return new Promise((resolve, reject) => {
+        function step(now) {
+          if (signal && signal.aborted) {
+            reject(new Error('aborted'));
+            return;
+          }
+
+          if (isPaused) {
+            if (!lastPauseStart) lastPauseStart = now;
+            requestAnimationFrame(step);
+            return;
+          } else if (lastPauseStart) {
+            pauseAccum += (now - lastPauseStart);
+            lastPauseStart = 0;
+          }
+
+          const elapsed = (now - startTime - pauseAccum);
+          const progress = Math.min(elapsed / durationMs, 1.0);
+          const eased = easeInOutQuad(progress);
+
+          currentF = fromF + (toF - fromF) * eased;
+          drawParallaxFrame(currentF);
+
+          if (progress < 1.0) {
+            requestAnimationFrame(step);
+          } else {
+            currentF = toF;
+            drawParallaxFrame(currentF);
+            resolve();
+          }
+        }
+        requestAnimationFrame(step);
+      });
+    }
+
+    async function runStoryLoop(startFromIdx = 0) {
+      if (abortController) abortController.abort();
+      abortController = new AbortController();
+      const signal = abortController.signal;
+
+      isPlaying = true;
+      startBtnWrap.classList.add('hidden');
+
+      try {
+        for (let i = startFromIdx; i < scenes.length; i++) {
+          currentSceneIdx = i;
+          const targetFrame = scenes[i].frame;
+
+          // 1. Transition to this scene frame
+          if (Math.abs(currentF - targetFrame) > 0.5) {
+            // Fade out previous text during transition
+            if (i > 0 && scenes[i - 1].el) scenes[i - 1].el.classList.remove('active');
+
+            const frameDelta = Math.abs(targetFrame - currentF);
+            // Smooth natural duration based on frame distance (0.8s - 1.4s)
+            const transDuration = Math.min(1400, Math.max(800, frameDelta * 24));
+            await animateFrames(currentF, targetFrame, transDuration, signal);
+          } else {
+            currentF = targetFrame;
+            drawParallaxFrame(currentF);
+          }
+
+          // 2. Arrived at scene! Show text crystal clear!
+          showSceneText(i);
+
+          // 3. HOLD on scene for 1.0 - 1.2s!
+          const holdMs = scenes[i].hold;
+          const holdStart = Date.now();
+          const holdInterval = 40;
+
+          // Animate progress bar during hold
+          while (Date.now() - holdStart < holdMs) {
+            if (signal.aborted) throw new Error('aborted');
+            if (!isPaused) {
+              const elapsed = Date.now() - holdStart;
+              updateProgressBar(i, elapsed / holdMs);
+            }
+            await sleep(holdInterval, signal);
+          }
+          updateProgressBar(i, 1.0);
+        }
+
+        // Story finished!
+        isPlaying = false;
+        // Gently reveal RSVP section after short delay
+        setTimeout(() => {
+          const rsvpSec = document.getElementById('rsvp');
+          if (rsvpSec) rsvpSec.scrollIntoView({ behavior: 'smooth' });
+        }, 1200);
+
+      } catch (err) {
+        if (err.message !== 'aborted') console.error(err);
+      }
+    }
+
+    window.startStory = function() {
+      if (!ready) return;
+      runStoryLoop(0);
+    };
+
+    window.replayStory = function() {
+      jumpToScene(0);
+      runStoryLoop(0);
+    };
+
+    function jumpToScene(idx) {
+      if (!ready) return;
+      currentSceneIdx = Math.max(0, Math.min(idx, scenes.length - 1));
+      currentF = scenes[currentSceneIdx].frame;
+      drawParallaxFrame(currentF);
+      showSceneText(currentSceneIdx);
+      updateProgressBar(currentSceneIdx, 0);
+
+      if (isPlaying) {
+        runStoryLoop(currentSceneIdx);
+      }
+    }
+
+    // Tap Interaction: Left = Prev, Center = Pause/Play, Right = Next
+    document.getElementById('tap-prev').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isPlaying) { startStory(); return; }
+      if (currentSceneIdx > 0) jumpToScene(currentSceneIdx - 1);
+    });
+
+    document.getElementById('tap-next').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isPlaying) { startStory(); return; }
+      if (currentSceneIdx < scenes.length - 1) jumpToScene(currentSceneIdx + 1);
+    });
+
+    document.getElementById('tap-pause').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isPlaying) { startStory(); return; }
+      isPaused = !isPaused;
+      pauseBadge.classList.toggle('show', isPaused);
+    });
+
+    // Details Overlay
+    window.toggleOverlay = function() {
+      const ov = document.getElementById('overlay');
+      ov.classList.toggle('open');
+      document.body.style.overflow = ov.classList.contains('open') ? 'hidden' : '';
+    };
+
+    // Countdown
+    function cd() {
+      const d = EVENT - new Date();
+      if (d <= 0) {
+        ['hero-cd-d','hero-cd-h','hero-cd-m','hero-cd-s'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '🎉';
+        });
+        return;
+      }
+      const days = Math.floor(d / 864e5);
+      const hours = String(Math.floor(d / 36e5 % 24)).padStart(2,'0');
+      const mins = String(Math.floor(d / 6e4 % 60)).padStart(2,'0');
+      const secs = String(Math.floor(d / 1e3 % 60)).padStart(2,'0');
+
+      const elD = document.getElementById('hero-cd-d');
+      const elH = document.getElementById('hero-cd-h');
+      const elM = document.getElementById('hero-cd-m');
+      const elS = document.getElementById('hero-cd-s');
+      if (elD) elD.textContent = days;
+      if (elH) elH.textContent = hours;
+      if (elM) elM.textContent = mins;
+      if (elS) elS.textContent = secs;
+    }
+
+    // Form
+    function setupForm() {
+      const form = document.getElementById('rsvp-form');
+      form.addEventListener('submit', async e => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('.btn-submit');
+        const origBtnText = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Отправка... ⏳';
+        }
+
+        const data = Object.fromEntries(new FormData(form).entries());
+        data.with_pair = data.with_pair === 'yes';
+        data.timestamp = new Date().toISOString();
+
+        // 1. Send to server database API
+        try {
+          const res = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (!res.ok) console.warn('Server responded with', res.status);
+        } catch (err) {
+          console.warn('API error, saving fallback:', err);
+        }
+
+        // 2. Backup to localStorage
+        try {
+          const all = JSON.parse(localStorage.getItem('rsvp') || '[]');
+          all.push(data);
+          localStorage.setItem('rsvp', JSON.stringify(all));
+        } catch (e) {}
+
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      });
+    }
+
+    async function init() {
+      buildProgressBar();
+      resize();
+      window.addEventListener('resize', resize);
+      window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+
+      await preload();
+      loader.classList.add('hidden');
+      ready = true;
+
+      // Render initial frame (Frame 1)
+      currentF = 0;
+      drawParallaxFrame(0);
+      showSceneText(0);
+
+      cd();
+      setInterval(cd, 1000);
+      setupForm();
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>
