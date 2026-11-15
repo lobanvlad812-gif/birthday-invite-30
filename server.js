@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 8030;
@@ -17,7 +18,38 @@ if (!fs.existsSync(DATA_FILE)) {
   fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
 }
 
-function loadResponses() {
+// ── Persistent PostgreSQL Database Setup ──
+let pool = null;
+if (process.env.DATABASE_URL) {
+  try {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+
+    pool.query(`
+      CREATE TABLE IF NOT EXISTS rsvp_responses (
+        id VARCHAR(64) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        attend VARCHAR(16) NOT NULL,
+        with_pair BOOLEAN NOT NULL DEFAULT FALSE,
+        drink VARCHAR(64) NOT NULL DEFAULT 'anything',
+        drink_label VARCHAR(64) NOT NULL DEFAULT 'Всё что нальют',
+        wishes TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        ip VARCHAR(128)
+      );
+    `).then(() => {
+      console.log('✓ PostgreSQL connected and rsvp_responses table ready');
+    }).catch(err => {
+      console.error('PostgreSQL table init error:', err);
+    });
+  } catch (err) {
+    console.error('Failed to initialize Postgres pool:', err);
+  }
+}
+
+function loadResponsesFromFile() {
   try {
     const raw = fs.readFileSync(DATA_FILE, 'utf8');
     return JSON.parse(raw);
@@ -27,7 +59,7 @@ function loadResponses() {
   }
 }
 
-function saveResponses(list) {
+function saveResponsesToFile(list) {
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2), 'utf8');
     return true;
@@ -35,6 +67,62 @@ function saveResponses(list) {
     console.error('Error writing data file:', err);
     return false;
   }
+}
+
+async function getAllResponses() {
+  if (pool) {
+    try {
+      const res = await pool.query('SELECT * FROM rsvp_responses ORDER BY created_at DESC');
+      return res.rows.map(r => ({
+        id: r.id,
+        name: r.name,
+        attend: r.attend,
+        with_pair: Boolean(r.with_pair),
+        drink: r.drink,
+        drink_label: r.drink_label,
+        wishes: r.wishes || '',
+        created_at: r.created_at ? new Date(r.created_at).toISOString() : new Date().toISOString(),
+        ip: r.ip || ''
+      }));
+    } catch (err) {
+      console.error('Database query error, falling back to file:', err);
+    }
+  }
+  return loadResponsesFromFile();
+}
+
+async function saveResponse(entry) {
+  if (pool) {
+    try {
+      await pool.query(
+        `INSERT INTO rsvp_responses (id, name, attend, with_pair, drink, drink_label, wishes, created_at, ip)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [entry.id, entry.name, entry.attend, entry.with_pair, entry.drink, entry.drink_label, entry.wishes, entry.created_at, entry.ip]
+      );
+      return true;
+    } catch (err) {
+      console.error('Database insert error, falling back to file:', err);
+    }
+  }
+  const responses = loadResponsesFromFile();
+  responses.unshift(entry);
+  saveResponsesToFile(responses);
+  return true;
+}
+
+async function deleteResponse(id) {
+  if (pool) {
+    try {
+      const res = await pool.query('DELETE FROM rsvp_responses WHERE id = $1', [id]);
+      return res.rowCount;
+    } catch (err) {
+      console.error('Database delete error, falling back to file:', err);
+    }
+  }
+  const list = loadResponsesFromFile();
+  const next = list.filter(r => r.id !== id);
+  saveResponsesToFile(next);
+  return list.length - next.length;
 }
 
 // Drink translation dictionary for display
@@ -65,14 +153,13 @@ app.use('/mobile_frames', express.static(path.join(__dirname, 'mobile_frames'), 
 app.use(express.static(__dirname));
 
 // ── API: Submit RSVP Form ──
-app.post('/api/rsvp', (req, res) => {
+app.post('/api/rsvp', async (req, res) => {
   const { name, attend, with_pair, drink, wishes } = req.body || {};
 
   if (!name || typeof name !== 'string' || !name.trim()) {
     return res.status(400).json({ ok: false, error: 'Пожалуйста, укажите имя' });
   }
 
-  const responses = loadResponses();
   const entry = {
     id: Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
     name: name.trim(),
@@ -85,8 +172,7 @@ app.post('/api/rsvp', (req, res) => {
     ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || ''
   };
 
-  responses.unshift(entry);
-  saveResponses(responses);
+  await saveResponse(entry);
 
   console.log(`[RSVP] Новый ответ от "${entry.name}": придет=${entry.attend}, с парой=${entry.with_pair}, напиток=${entry.drink}`);
 
@@ -99,13 +185,13 @@ app.post('/api/rsvp', (req, res) => {
 });
 
 // ── API: Get All Responses (Admin only) ──
-app.get('/api/rsvp', (req, res) => {
+app.get('/api/rsvp', async (req, res) => {
   const pin = req.headers['x-admin-pin'] || req.query.pin;
   if (pin !== ADMIN_PIN) {
     return res.status(401).json({ ok: false, error: 'Неверный PIN-код' });
   }
 
-  const list = loadResponses();
+  const list = await getAllResponses();
 
   // Compute summary stats
   const total = list.length;
@@ -137,28 +223,26 @@ app.get('/api/rsvp', (req, res) => {
 });
 
 // ── API: Delete Response (Admin only) ──
-app.delete('/api/rsvp/:id', (req, res) => {
+app.delete('/api/rsvp/:id', async (req, res) => {
   const pin = req.headers['x-admin-pin'] || req.query.pin;
   if (pin !== ADMIN_PIN) {
     return res.status(401).json({ ok: false, error: 'Неверный PIN-код' });
   }
 
   const { id } = req.params;
-  const list = loadResponses();
-  const next = list.filter(r => r.id !== id);
-  saveResponses(next);
+  const deleted = await deleteResponse(id);
 
-  res.json({ ok: true, deleted: list.length - next.length });
+  res.json({ ok: true, deleted });
 });
 
 // ── API: Export to Excel / CSV ──
-app.get('/api/rsvp/export', (req, res) => {
+app.get('/api/rsvp/export', async (req, res) => {
   const pin = req.query.pin;
   if (pin !== ADMIN_PIN) {
     return res.status(401).send('Неверный PIN-код');
   }
 
-  const list = loadResponses();
+  const list = await getAllResponses();
 
   // UTF-8 BOM so Excel opens Cyrillic characters perfectly
   let csv = '\uFEFF';
