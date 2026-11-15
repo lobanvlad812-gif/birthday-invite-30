@@ -51,8 +51,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Cache frame images for fast mobile loading
+// Cache frame images for fast loading
 app.use('/frames', express.static(path.join(__dirname, 'frames'), {
+  maxAge: '7d',
+  immutable: true
+}));
+app.use('/mobile_frames', express.static(path.join(__dirname, 'mobile_frames'), {
   maxAge: '7d',
   immutable: true
 }));
