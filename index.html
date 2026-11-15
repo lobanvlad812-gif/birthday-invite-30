@@ -743,7 +743,7 @@
     const isMobile = window.innerWidth <= 768 || (window.innerHeight > window.innerWidth && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
 
     // Media parameters based on device type
-    const TOTAL = isMobile ? 530 : 257;
+    const TOTAL = isMobile ? 265 : 257;
     const FRAMES_DIR = isMobile ? 'mobile_frames' : 'frames';
     const EVENT = new Date('2026-12-12T16:00:00+03:00');
 
@@ -764,22 +764,22 @@
 
     // 16 Scenes with exact frame target & hold time (in ms)
     const scenesConfig = isMobile ? [
-      { id: 'f-intro-1', frame: 0, hold: 1000 },             // 1. Мои дорогие (статика 1..46)
-      { id: 'f-intro-2', frame: 50, hold: 1000 },            // 2. Приглашаю отметить юбилей (зум 47..70)
-      { id: 'f-unforgettable', frame: 80, hold: 1000 },      // 3. Незабываемый вечер
-      { id: 'f-date-left', frame: 109, hold: 1000 },         // 4. 12.12
-      { id: 'f-time-right', frame: 135, hold: 1000 },        // 5. Время начала 16.00
-      { id: 'f-place-left', frame: 156, hold: 1200 },        // 6. Санкт-Петербург...
-      { id: 'f-timer', frame: 180, hold: 1000 },             // 7. Таймер Осталось
-      { id: 'f-wait-left', frame: 206, hold: 1000 },         // 8. Жду тебя!
-      { id: 'f-great-right', frame: 228, hold: 1000 },       // 9. Будет здорово!
-      { id: 'f-dont-miss', frame: 254, hold: 1000 },         // 10. Не пропусти!
-      { id: 'f-fun', frame: 278, hold: 1000 },               // 11. Тебя ждет супер веселье!
-      { id: 'f-remember', frame: 302, hold: 1000 },          // 12. Этот вечер ты запомнишь...
-      { id: 'f-fasten', frame: 326, hold: 1000 },            // 13. Пристегнись, будет жарко 🔥
-      { id: 'f-countdown-started', frame: 350, hold: 1000 },  // 14. Обратный отсчет... ⏳
-      { id: 'f-details-repeat', frame: 417, hold: 1300 },    // 15. 12.12. 16:00 СПб
-      { id: 'f-confirm-cta', frame: 529, hold: 3000 }        // 16. Подтвердите своё участие
+      { id: 'f-intro-1', frame: 0, hold: 1000 },             // 1. Чистый собор (статика)
+      { id: 'f-intro-2', frame: 25, hold: 1000 },            // 2. Чистый собор (зум)
+      { id: 'f-unforgettable', frame: 40, hold: 1000 },      // 3. Незабываемый вечер
+      { id: 'f-date-left', frame: 54, hold: 1000 },          // 4. 12.12
+      { id: 'f-time-right', frame: 68, hold: 1000 },         // 5. Время начала 16.00
+      { id: 'f-place-left', frame: 78, hold: 1200 },         // 6. Санкт-Петербург...
+      { id: 'f-timer', frame: 90, hold: 1000 },              // 7. Таймер Осталось
+      { id: 'f-wait-left', frame: 103, hold: 1000 },         // 8. Жду тебя!
+      { id: 'f-great-right', frame: 114, hold: 1000 },       // 9. Будет здорово!
+      { id: 'f-dont-miss', frame: 127, hold: 1000 },         // 10. Не пропусти!
+      { id: 'f-fun', frame: 139, hold: 1000 },               // 11. Тебя ждет супер веселье!
+      { id: 'f-remember', frame: 151, hold: 1000 },          // 12. Этот вечер ты запомнишь...
+      { id: 'f-fasten', frame: 163, hold: 1000 },            // 13. Пристегнись, будет жарко 🔥
+      { id: 'f-countdown-started', frame: 175, hold: 1000 },  // 14. Обратный отсчет... ⏳
+      { id: 'f-details-repeat', frame: 208, hold: 1300 },    // 15. 12.12. 16:00 СПб
+      { id: 'f-confirm-cta', frame: 264, hold: 3000 }        // 16. Подтвердите своё участие
     ] : [
       { id: 'f-intro-1', frame: 0, hold: 1000 },           // 1. Мои дорогие (кадры 1–21)
       { id: 'f-intro-2', frame: 27, hold: 1000 },          // 2. Приглашаю отметить юбилей (кадры 22–34)
@@ -857,21 +857,64 @@
 
     function pad(n) { return String(n).padStart(3, '0'); }
 
-    function preload() {
+    // Instant Startup: Preload only initial batch of frames so site opens in under 1 second!
+    const INITIAL_BATCH = 15;
+
+    function preloadInitial() {
       return new Promise(resolve => {
-        for (let i = 1; i <= TOTAL; i++) {
+        let initialLoaded = 0;
+        const target = Math.min(INITIAL_BATCH, TOTAL);
+        for (let i = 1; i <= target; i++) {
           const img = new Image();
           img.onload = img.onerror = () => {
+            initialLoaded++;
             loaded++;
-            const p = Math.round(loaded / TOTAL * 100);
+            const p = Math.min(100, Math.round(initialLoaded / target * 100));
             loaderFill.style.width = p + '%';
             loaderPct.textContent = p + '%';
-            if (loaded === TOTAL) resolve();
+            if (initialLoaded === target) resolve();
           };
-          img.src = `${FRAMES_DIR}/frame_${pad(i)}.jpg`;
+          img.src = `${FRAMES_DIR}/frame_${pad(i)}.webp`;
           frames[i - 1] = img;
         }
       });
+    }
+
+    // Stream remaining frames in background with controlled concurrency (6 parallel streams)
+    function streamRemainingFrames() {
+      let nextIdx = INITIAL_BATCH + 1;
+      const CONCURRENCY = 6;
+      let active = 0;
+
+      function pump() {
+        while (active < CONCURRENCY && nextIdx <= TOTAL) {
+          const i = nextIdx++;
+          active++;
+          const img = new Image();
+          img.onload = img.onerror = () => {
+            loaded++;
+            active--;
+            pump();
+          };
+          img.src = `${FRAMES_DIR}/frame_${pad(i)}.webp`;
+          frames[i - 1] = img;
+        }
+      }
+      pump();
+    }
+
+    // Resilient frame accessor: returns nearest loaded frame so canvas never flickers or goes blank
+    function getLoadedFrame(idx) {
+      if (frames[idx] && frames[idx].complete && frames[idx].naturalWidth > 0) return frames[idx];
+      for (let d = 1; d <= idx; d++) {
+        const prev = frames[idx - d];
+        if (prev && prev.complete && prev.naturalWidth > 0) return prev;
+      }
+      for (let d = 1; idx + d < TOTAL; d++) {
+        const next = frames[idx + d];
+        if (next && next.complete && next.naturalWidth > 0) return next;
+      }
+      return frames[0] || null;
     }
 
     function resize() {
@@ -892,14 +935,14 @@
       const nextIdx = Math.min(baseIdx + 1, TOTAL - 1);
       const alpha = fi - baseIdx;
 
-      const img1 = frames[baseIdx];
-      const img2 = frames[nextIdx];
+      const img1 = getLoadedFrame(baseIdx);
       if (!img1 || !img1.naturalWidth) return;
+      const img2 = (alpha > 0.01 && nextIdx !== baseIdx) ? getLoadedFrame(nextIdx) : null;
 
       const cw = canvas.width;
       const ch = canvas.height;
-      const sWidth = img1.naturalWidth || 1920;
-      const sHeight = img1.naturalHeight || 960;
+      const sWidth = img1.naturalWidth || (isMobile ? 720 : 1920);
+      const sHeight = img1.naturalHeight || (isMobile ? 1280 : 960);
       const imgRatio = sWidth / sHeight;
 
       ctx.clearRect(0, 0, cw, ch);
@@ -924,7 +967,7 @@
 
         ctx.drawImage(img1, fgX, fgY, fgW, fgH);
 
-        if (alpha > 0.01 && nextIdx !== baseIdx && img2 && img2.naturalWidth) {
+        if (alpha > 0.01 && img2 && img2 !== img1 && img2.naturalWidth) {
           ctx.globalAlpha = alpha;
           ctx.drawImage(img2, fgX, fgY, fgW, fgH);
           ctx.globalAlpha = 1.0;
@@ -939,7 +982,7 @@
 
         ctx.drawImage(img1, offsetX, offsetY, drawW, drawH);
 
-        if (alpha > 0.01 && nextIdx !== baseIdx && img2 && img2.naturalWidth) {
+        if (alpha > 0.01 && img2 && img2 !== img1 && img2.naturalWidth) {
           ctx.globalAlpha = alpha;
           ctx.drawImage(img2, offsetX, offsetY, drawW, drawH);
           ctx.globalAlpha = 1.0;
@@ -1065,7 +1108,7 @@
 
             const frameDelta = Math.abs(targetFrame - currentF);
             // Smooth natural duration based on frame distance (0.75s - 1.4s)
-            const transDuration = Math.min(1400, Math.max(750, frameDelta * (isMobile ? 12 : 24)));
+            const transDuration = Math.min(1400, Math.max(750, frameDelta * 24));
             await animateFrames(currentF, targetFrame, transDuration, signal);
           } else {
             currentF = targetFrame;
@@ -1226,7 +1269,7 @@
       window.addEventListener('resize', resize);
       window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 
-      await preload();
+      await preloadInitial();
       loader.classList.add('hidden');
       ready = true;
 
@@ -1234,6 +1277,9 @@
       currentF = 0;
       drawParallaxFrame(0);
       showSceneText(0);
+
+      // Stream remaining frames in background
+      streamRemainingFrames();
 
       cd();
       setInterval(cd, 1000);
