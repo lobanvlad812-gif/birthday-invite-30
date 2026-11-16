@@ -561,7 +561,26 @@
       border-top: 1px solid rgba(223, 177, 91, .1);
     }
     footer p { color: var(--muted); font-size: .82rem; font-weight: 300; }
-    footer .heart { color: var(--gold); }
+    footer .heart-admin-link {
+      text-decoration: none;
+      display: inline-block;
+      padding: 0.35rem 0.55rem;
+      margin: -0.35rem -0.25rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      vertical-align: middle;
+    }
+    footer .heart {
+      color: var(--gold);
+      display: inline-block;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.25s ease;
+    }
+    footer .heart-admin-link:hover .heart,
+    footer .heart-admin-link:active .heart {
+      transform: scale(1.4);
+      filter: drop-shadow(0 0 10px rgba(223, 177, 91, 0.95));
+    }
 
     @media (max-width: 768px) {
       .alcohol-grid { grid-template-columns: repeat(2, 1fr); }
@@ -875,7 +894,7 @@
   </section>
 
   <footer>
-    <p>Сделано с <span class="heart">♥</span> для самого лучшего юбилея</p>
+    <p>Сделано с <a href="/admin" class="heart-admin-link" title="Доступ к анкетам"><span class="heart">♥</span></a> для самого лучшего юбилея</p>
   </footer>
 
   <script>

@@ -203,7 +203,8 @@
       <div class="header-actions">
         <button class="btn btn-outline" onclick="loadData()">🔄 Обновить</button>
         <button class="btn btn-gold" onclick="exportCsv()">📥 Скачать в Excel</button>
-        <a href="/" class="btn btn-outline" target="_blank">🌐 На сайт</a>
+        <a href="/" class="btn btn-outline">🌐 На сайт</a>
+        <button class="btn btn-outline" onclick="logout()">🔒 Выйти</button>
       </div>
     </header>
 
@@ -393,6 +394,11 @@
 
     function exportCsv() {
       window.location.href = `/api/rsvp/export?pin=${encodeURIComponent(currentPin)}`;
+    }
+
+    function logout() {
+      sessionStorage.removeItem('admin_pin');
+      location.reload();
     }
 
     function escapeHtml(str) {
