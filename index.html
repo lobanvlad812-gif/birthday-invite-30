@@ -56,7 +56,9 @@
 
     /* Instagram-Stories Progress Bar */
     #story-progress {
-      display: flex; gap: 4px; width: 100%; max-width: 800px; margin: 0 auto 0.7rem;
+      display: flex; gap: 4px; width: 100%;
+      max-width: min(100%, calc(100vh * (9 / 16) - 1.5rem), 540px);
+      margin: 0 auto 0.7rem;
     }
     .prog-seg {
       flex: 1; height: 3px; background: rgba(255, 255, 255, 0.22); border-radius: 3px;
@@ -72,7 +74,9 @@
     /* Top Action Buttons */
     .top-actions {
       display: flex; align-items: center; justify-content: space-between;
-      max-width: 900px; margin: 0 auto;
+      width: 100%;
+      max-width: min(100%, calc(100vh * (9 / 16) - 1.5rem), 540px);
+      margin: 0 auto;
     }
     .top-pill-btn {
       padding: .45rem 1rem; border-radius: 50px;
@@ -188,7 +192,7 @@
       top: clamp(40px, 8.5vh, 85px);
       transform: translate(-50%, 0) scale(0.95);
       width: 100%;
-      max-width: 900px;
+      max-width: min(92vw, calc(100vh * (9 / 16) - 1.5rem), 540px);
       box-sizing: border-box;
       opacity: 0;
       visibility: hidden;
@@ -196,7 +200,7 @@
       transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
       will-change: opacity, transform;
       text-align: center;
-      padding: 0 1.2rem;
+      padding: 0 1rem;
     }
     .hero-text.active {
       opacity: 1;
@@ -210,13 +214,13 @@
     .hero-text.align-left,
     .hero-text.align-right {
       text-align: center;
-      padding: 0 1.2rem;
+      padding: 0 1rem;
     }
 
     /* Animated Gold 30 Badge */
     .anniversary-badge-glow {
       font-family: var(--display);
-      font-size: clamp(3.8rem, 15vw, 9rem);
+      font-size: clamp(3.2rem, 9.5vh, 5.5rem);
       font-weight: 900;
       line-height: 0.95;
       margin-bottom: 0.35rem;
@@ -299,7 +303,7 @@
     }
     .hero-cd-item .cd-num {
       font-family: var(--display);
-      font-size: clamp(2.2rem, 8vw, 5.2rem);
+      font-size: clamp(1.8rem, 4.8vh, 3.2rem);
       color: #fff;
       line-height: 1; font-weight: 800;
       text-shadow: 0 4px 20px rgba(0,0,0,0.95), 0 0 32px rgba(223, 177, 91, 0.65);
@@ -684,103 +688,103 @@
       <!-- 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей! по центру -->
       <div class="hero-text align-center active" id="s-anniversary">
         <div class="anniversary-badge-glow">30</div>
-        <div class="hero-huge-title" style="font-size: clamp(1.8rem, 6.2vw, 4rem); line-height: 1.18;">
+        <div class="hero-huge-title" style="font-size: clamp(1.5rem, 3.8vh, 2.4rem); line-height: 1.18;">
           Приглашаю Вас<br>на свой юбилей!
         </div>
       </div>
 
       <!-- 2. 40-49: 12.12 (большими буквами вверху по центру) -->
       <div class="hero-text align-center" id="s-date">
-        <div class="hero-giant-number" style="font-size: clamp(3.8rem, 14vw, 9.5rem); line-height: 0.95;">12.12</div>
+        <div class="hero-giant-number" style="font-size: clamp(3.2rem, 9vh, 6.2rem); line-height: 0.95;">12.12</div>
       </div>
 
       <!-- 3. 57-65: Незабываемый вечер -->
       <div class="hero-text align-center" id="s-unforgettable">
-        <div class="hero-huge-title" style="font-size: clamp(2.3rem, 8vw, 5.8rem); line-height: 1.15;">
+        <div class="hero-huge-title" style="font-size: clamp(1.9rem, 4.8vh, 3.4rem); line-height: 1.15;">
           Незабываемый<br>вечер
         </div>
       </div>
 
       <!-- 4. 71-81: Время начала 16.00 -->
       <div class="hero-text align-center" id="s-time">
-        <div class="hero-sub-line" style="font-size: clamp(1.3rem, 4.4vw, 2.6rem); margin-bottom: 0.2rem;">Время начала</div>
-        <div class="hero-giant-number" style="font-size: clamp(3.2rem, 11vw, 7.5rem); line-height: 1;">16.00</div>
+        <div class="hero-sub-line" style="font-size: clamp(1.1rem, 2.6vh, 1.8rem); margin-bottom: 0.2rem;">Время начала</div>
+        <div class="hero-giant-number" style="font-size: clamp(2.8rem, 7.5vh, 5.2rem); line-height: 1;">16.00</div>
       </div>
 
       <!-- 5. 88-97: Санкт-Петербург -->
       <div class="hero-text align-center" id="s-city">
-        <div class="hero-huge-title" style="font-size: clamp(2.4rem, 8.5vw, 6rem); line-height: 1.15;">
+        <div class="hero-huge-title" style="font-size: clamp(1.9rem, 5vh, 3.6rem); line-height: 1.15;">
           Санкт-Петербург
         </div>
       </div>
 
       <!-- 6. 104-112: Кожевенная линия, 34 -->
       <div class="hero-text align-center" id="s-address">
-        <div class="hero-huge-title" style="font-size: clamp(2.1rem, 7.2vw, 5rem); line-height: 1.2;">
+        <div class="hero-huge-title" style="font-size: clamp(1.8rem, 4.5vh, 3.2rem); line-height: 1.2;">
           Кожевенная<br>линия, 34
         </div>
       </div>
 
       <!-- 7. 119-128: Осталось "таймер" (не в квадратах) -->
       <div class="hero-text align-center" id="s-timer">
-        <div class="hero-sub-line" style="margin-bottom: 0.4rem; font-size: clamp(1.3rem, 4.2vw, 2.4rem); letter-spacing: 0.1em; text-transform: uppercase;">Осталось</div>
+        <div class="hero-sub-line" style="margin-bottom: 0.4rem; font-size: clamp(1.1rem, 2.6vh, 1.8rem); letter-spacing: 0.1em; text-transform: uppercase;">Осталось</div>
         <div class="hero-countdown">
           <div class="hero-cd-item"><div class="cd-num" id="hero-cd-d">--</div><div class="cd-label">дней</div></div>
-          <div class="hero-cd-sep" style="font-size: clamp(1.6rem, 5.5vw, 3.8rem); color: rgba(223, 177, 91, 0.75); line-height: 1; align-self: flex-start; margin-top: 0.2rem;">:</div>
+          <div class="hero-cd-sep" style="font-size: clamp(1.4rem, 3.5vh, 2.4rem); color: rgba(223, 177, 91, 0.75); line-height: 1; align-self: flex-start; margin-top: 0.2rem;">:</div>
           <div class="hero-cd-item"><div class="cd-num" id="hero-cd-h">--</div><div class="cd-label">часов</div></div>
-          <div class="hero-cd-sep" style="font-size: clamp(1.6rem, 5.5vw, 3.8rem); color: rgba(223, 177, 91, 0.75); line-height: 1; align-self: flex-start; margin-top: 0.2rem;">:</div>
+          <div class="hero-cd-sep" style="font-size: clamp(1.4rem, 3.5vh, 2.4rem); color: rgba(223, 177, 91, 0.75); line-height: 1; align-self: flex-start; margin-top: 0.2rem;">:</div>
           <div class="hero-cd-item"><div class="cd-num" id="hero-cd-m">--</div><div class="cd-label">минут</div></div>
-          <div class="hero-cd-sep" style="font-size: clamp(1.6rem, 5.5vw, 3.8rem); color: rgba(223, 177, 91, 0.75); line-height: 1; align-self: flex-start; margin-top: 0.2rem;">:</div>
+          <div class="hero-cd-sep" style="font-size: clamp(1.4rem, 3.5vh, 2.4rem); color: rgba(223, 177, 91, 0.75); line-height: 1; align-self: flex-start; margin-top: 0.2rem;">:</div>
           <div class="hero-cd-item"><div class="cd-num" id="hero-cd-s">--</div><div class="cd-label">секунд</div></div>
         </div>
       </div>
 
       <!-- 8. 134-143: Не пропусти! -->
       <div class="hero-text align-center" id="s-dont-miss">
-        <div class="hero-huge-title" style="font-size: clamp(2.8rem, 10.5vw, 7.2rem);">
+        <div class="hero-huge-title" style="font-size: clamp(2.2rem, 5.8vh, 4.2rem);">
           Не пропусти!
         </div>
       </div>
 
       <!-- 9. 147: Будут сюрпризы! (кадр с семьей на 2 секунды) -->
       <div class="hero-text align-center" id="s-surprises">
-        <div class="hero-huge-title" style="font-size: clamp(2.3rem, 8vw, 5.6rem); line-height: 1.15;">
+        <div class="hero-huge-title" style="font-size: clamp(1.9rem, 4.8vh, 3.4rem); line-height: 1.15;">
           Будут сюрпризы! ✨
         </div>
       </div>
 
       <!-- 10. 152-159: Этот вечер ты запомнишь на долго! -->
       <div class="hero-text align-center" id="s-remember">
-        <div class="hero-huge-title" style="font-size: clamp(2rem, 6.8vw, 4.8rem); line-height: 1.18;">
+        <div class="hero-huge-title" style="font-size: clamp(1.7rem, 4.2vh, 3rem); line-height: 1.18;">
           Этот вечер ты<br>запомнишь надолго!
         </div>
       </div>
 
       <!-- 11. 167-176: Жду тебя! -->
       <div class="hero-text align-center" id="s-wait">
-        <div class="hero-huge-title" style="font-size: clamp(3rem, 11.5vw, 8rem);">
+        <div class="hero-huge-title" style="font-size: clamp(2.4rem, 6.5vh, 4.6rem);">
           Жду тебя!
         </div>
       </div>
 
       <!-- 12. 183-190: Поехали! -->
       <div class="hero-text align-center" id="s-lets-go">
-        <div class="hero-huge-title" style="font-size: clamp(3.2rem, 12vw, 8.5rem);">
+        <div class="hero-huge-title" style="font-size: clamp(2.5rem, 6.8vh, 4.8rem);">
           Поехали! 🚀
         </div>
       </div>
 
       <!-- 13. 251-259: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34 -->
       <div class="hero-text align-center" id="s-repeat">
-        <div class="hero-giant-number" style="font-size: clamp(2.6rem, 9.5vw, 6.5rem); margin-bottom: 0.1rem; line-height: 1;">12.12 · 16:00</div>
-        <div class="hero-sub-line" style="font-size: clamp(1.3rem, 4.2vw, 2.4rem); color: #f5f0eb; font-weight: 400; line-height: 1.3;">
+        <div class="hero-giant-number" style="font-size: clamp(2.1rem, 5.6vh, 3.8rem); margin-bottom: 0.1rem; line-height: 1;">12.12 · 16:00</div>
+        <div class="hero-sub-line" style="font-size: clamp(1.1rem, 2.6vh, 1.8rem); color: #f5f0eb; font-weight: 400; line-height: 1.3;">
           Санкт-Петербург,<br>Кожевенная линия, 34
         </div>
       </div>
 
       <!-- 14. 265: Пожалуйста подтвердите свое участие в анкете! -->
       <div class="hero-text align-center" id="s-confirm-cta">
-        <div class="hero-huge-title" style="font-size: clamp(1.45rem, 5vw, 3.4rem); line-height: 1.22; margin-bottom: 0.85rem; text-shadow: 0 4px 20px rgba(0,0,0,0.95), 0 0 35px rgba(223, 177, 91, 0.45);">
+        <div class="hero-huge-title" style="font-size: clamp(1.3rem, 3.2vh, 2.2rem); line-height: 1.22; margin-bottom: 0.85rem; text-shadow: 0 4px 20px rgba(0,0,0,0.95), 0 0 35px rgba(223, 177, 91, 0.45);">
           Пожалуйста, подтвердите<br>своё участие в анкете!
         </div>
         <div class="final-actions-wrap">
@@ -904,9 +908,9 @@
     // ── Adaptive Device Detection (Desktop vs Mobile 9:16) ──
     const isMobile = window.innerWidth <= 768 || (window.innerHeight > window.innerWidth && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
 
-    // Media parameters based on device type
-    const TOTAL = isMobile ? 266 : 258;
-    const FRAMES_DIR = isMobile ? 'mobile_frames' : 'frames';
+    // Media parameters: unified mobile_frames sequence (266 frames) for all devices
+    const TOTAL = 266;
+    const FRAMES_DIR = 'mobile_frames';
     const EVENT = new Date('2026-12-12T16:00:00+03:00');
 
     const canvas = document.getElementById('hero-canvas');
@@ -920,12 +924,12 @@
     const storyProgressCont = document.getElementById('story-progress');
 
     // On mobile screens, vertical 9:16 frames fill screen edge-to-edge naturally
-    if (isMobile && viewModeBtn) {
+    if (viewModeBtn) {
       viewModeBtn.style.display = 'none';
     }
 
-    // 14 Scenes strictly aligned with user specifications
-    const scenesConfig = isMobile ? [
+    // 14 Scenes strictly aligned with user specifications (unified for mobile and desktop)
+    const scenesConfig = [
       { id: 's-anniversary', frame: 28, hold: 1600 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
       { id: 's-date', frame: 44, hold: 1200 },                // 2. 40-49: 12.12 (вверху по центру, не перекрывая лица)
       { id: 's-unforgettable', frame: 60, hold: 1200 },       // 3. 57-65: Незабываемый вечер
@@ -940,21 +944,6 @@
       { id: 's-lets-go', frame: 186, hold: 1200 },            // 12. 183-190: Поехали! (затем полет 195-251)
       { id: 's-repeat', frame: 254, hold: 1600 },             // 13. 251-259: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
       { id: 's-confirm-cta', frame: 265, hold: 3500 }         // 14. 265: Пожалуйста подтвердите свое участие в анкете!
-    ] : [
-      { id: 's-anniversary', frame: 28, hold: 1600 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
-      { id: 's-date', frame: 44, hold: 1200 },                // 2. 40-49: 12.12 (вверху по центру, не перекрывая лица)
-      { id: 's-unforgettable', frame: 60, hold: 1200 },       // 3. 57-65: Незабываемый вечер
-      { id: 's-time', frame: 75, hold: 1200 },                // 4. 71-81: Время начала 16.00
-      { id: 's-city', frame: 92, hold: 1200 },                // 5. 88-97: Санкт-Петербург
-      { id: 's-address', frame: 107, hold: 1200 },            // 6. 104-112: Кожевенная линия, 34
-      { id: 's-timer', frame: 123, hold: 1600 },              // 7. 119-128: Осталось "таймер" (не в квадратах)
-      { id: 's-dont-miss', frame: 138, hold: 1200 },          // 8. 134-143: Не пропусти!
-      { id: 's-surprises', frame: 146, hold: 2000 },          // 9. 147: Будут сюрпризы! (кадр семьи на 2 секунды)
-      { id: 's-remember', frame: 155, hold: 1300 },           // 10. 152-159: Этот вечер ты запомнишь на долго!
-      { id: 's-wait', frame: 171, hold: 1200 },               // 11. 167-176: Жду тебя!
-      { id: 's-lets-go', frame: 186, hold: 1200 },            // 12. 183-190: Поехали! (затем полет 195-251)
-      { id: 's-repeat', frame: 251, hold: 1600 },             // 13. 251-259: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
-      { id: 's-confirm-cta', frame: 257, hold: 3500 }         // 14. 265: Пожалуйста подтвердите свое участие в анкете!
     ];
 
     const scenes = scenesConfig.map((s, idx) => ({ ...s, index: idx, el: document.getElementById(s.id) }));
@@ -1083,8 +1072,8 @@
 
       const cw = canvas.width;
       const ch = canvas.height;
-      const sWidth = img1.naturalWidth || (isMobile ? 720 : 1920);
-      const sHeight = img1.naturalHeight || (isMobile ? 1280 : 960);
+      const sWidth = img1.naturalWidth || 720;
+      const sHeight = img1.naturalHeight || 1280;
       const imgRatio = sWidth / sHeight;
 
       ctx.clearRect(0, 0, cw, ch);
@@ -1325,6 +1314,7 @@
 
     function jumpToScene(idx) {
       if (!ready) return;
+      if (startBtnWrap && idx > 0) startBtnWrap.classList.add('hidden');
       currentSceneIdx = Math.max(0, Math.min(idx, scenes.length - 1));
       currentF = scenes[currentSceneIdx].frame;
       drawParallaxFrame(currentF);
@@ -1335,6 +1325,7 @@
         runStoryLoop(currentSceneIdx);
       }
     }
+    window.jumpToScene = jumpToScene;
 
     // Tap Interaction: Left = Prev, Center = Pause/Play, Right = Next
     document.getElementById('tap-prev').addEventListener('click', (e) => {
