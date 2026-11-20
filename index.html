@@ -908,8 +908,8 @@
     // ── Adaptive Device Detection (Desktop vs Mobile 9:16) ──
     const isMobile = window.innerWidth <= 768 || (window.innerHeight > window.innerWidth && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
 
-    // Media parameters: unified mobile_frames sequence (266 frames) for all devices
-    const TOTAL = 266;
+    // Media parameters: unified mobile_frames sequence (297 frames) for all devices
+    const TOTAL = 297;
     const FRAMES_DIR = 'mobile_frames';
     const EVENT = new Date('2026-12-12T16:00:00+03:00');
 
@@ -941,9 +941,9 @@
       { id: 's-surprises', frame: 146, hold: 2000 },          // 9. 147: Будут сюрпризы! (кадр семьи на 2 секунды)
       { id: 's-remember', frame: 155, hold: 1300 },           // 10. 152-159: Этот вечер ты запомнишь на долго!
       { id: 's-wait', frame: 171, hold: 1200 },               // 11. 167-176: Жду тебя!
-      { id: 's-lets-go', frame: 186, hold: 1200 },            // 12. 183-190: Поехали! (затем полет 195-251)
-      { id: 's-repeat', frame: 254, hold: 1600 },             // 13. 251-259: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
-      { id: 's-confirm-cta', frame: 265, hold: 3500 }         // 14. 265: Пожалуйста подтвердите свое участие в анкете!
+      { id: 's-lets-go', frame: 217, hold: 1200 },            // 12. 183-190 (+31 = 217): Поехали! (затем полет)
+      { id: 's-repeat', frame: 285, hold: 1600 },             // 13. 251-259 (+31 = 285): 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
+      { id: 's-confirm-cta', frame: 296, hold: 3500 }         // 14. 265 (+31 = 296): Пожалуйста подтвердите свое участие в анкете!
     ];
 
     const scenes = scenesConfig.map((s, idx) => ({ ...s, index: idx, el: document.getElementById(s.id) }));
@@ -1033,18 +1033,31 @@
       });
     }
 
-    // ── Dynamic sizing for crystal-clear 3402x1536 guest panorama ──
+    // ── Dynamic sizing for crystal-clear 3600x1536 guest panorama ──
     function updatePanoramaSize() {
       const panoImg = document.getElementById('panorama-img');
       const panoScroll = document.getElementById('panorama-scroll');
       if (!panoImg || !panoScroll) return;
       const h = panoScroll.clientHeight || window.innerHeight;
-      // Original dimensions: 3402 x 1536 (aspect ratio ≈ 2.21484)
-      const w = Math.round(h * (3402 / 1536));
+      // Dimensions: 3600 x 1536 (aspect ratio = 3600 / 1536 = 2.34375)
+      const w = Math.round(h * (3600 / 1536));
       panoImg.style.height = h + 'px';
       panoImg.style.width = w + 'px';
       panoImg.style.minWidth = w + 'px';
       panoImg.style.maxWidth = 'none';
+    }
+
+    // ── Center panorama horizontally so central couple is precisely centered ──
+    function centerPanoramaOnCouple() {
+      const scrollEl = document.getElementById('panorama-scroll');
+      if (!scrollEl) return;
+      const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+      if (maxScroll > 0) {
+        // In 3600px wide image, central couple midpoint is at X = 1650 (ratio = 1650 / 3600 ≈ 0.45833)
+        const coupleRatio = 1650 / 3600;
+        const targetScroll = Math.round((scrollEl.scrollWidth * coupleRatio) - (scrollEl.clientWidth / 2));
+        scrollEl.scrollLeft = Math.max(0, Math.min(targetScroll, maxScroll));
+      }
     }
 
     function resize() {
@@ -1056,6 +1069,10 @@
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
       updatePanoramaSize();
+      const panoWrap = document.getElementById('final-panorama-wrap');
+      if (panoWrap && panoWrap.classList.contains('active')) {
+        centerPanoramaOnCouple();
+      }
       if (ready) drawParallaxFrame(currentF);
     }
 
@@ -1139,19 +1156,14 @@
       if (panoWrap) {
         if (isFinal) {
           updatePanoramaSize();
+          centerPanoramaOnCouple();
           panoWrap.classList.add('active');
           tapZones.forEach(z => z.style.display = 'none');
-          // Center the panorama horizontally so central cathedral & host are in initial view
+          // Center the panorama horizontally so central couple is precisely centered
           setTimeout(() => {
             updatePanoramaSize();
-            const scrollEl = document.getElementById('panorama-scroll');
-            if (scrollEl) {
-              const maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
-              if (maxScroll > 0) {
-                scrollEl.scrollLeft = Math.round(maxScroll / 2);
-              }
-            }
-          }, 50);
+            centerPanoramaOnCouple();
+          }, 60);
         } else {
           panoWrap.classList.remove('active');
           tapZones.forEach(z => z.style.display = '');
