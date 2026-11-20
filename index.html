@@ -767,7 +767,14 @@
         </div>
       </div>
 
-      <!-- 12. 183-190: Поехали! -->
+      <!-- 12. 179-209 (кадр 207): Скачем на всех порах! -->
+      <div class="hero-text align-center" id="s-gallop">
+        <div class="hero-huge-title" style="font-size: clamp(1.8rem, 4.6vh, 3.2rem); line-height: 1.16;">
+          Скачем на всех порах! 🐎
+        </div>
+      </div>
+
+      <!-- 13. 214-221 (кадр 217): Поехали! -->
       <div class="hero-text align-center" id="s-lets-go">
         <div class="hero-huge-title" style="font-size: clamp(2.5rem, 6.8vh, 4.8rem);">
           Поехали! 🚀
@@ -928,7 +935,7 @@
       viewModeBtn.style.display = 'none';
     }
 
-    // 14 Scenes strictly aligned with user specifications (unified for mobile and desktop)
+    // 15 Scenes strictly aligned with user specifications (unified for mobile and desktop)
     const scenesConfig = [
       { id: 's-anniversary', frame: 28, hold: 1600 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
       { id: 's-date', frame: 44, hold: 1200 },                // 2. 40-49: 12.12 (вверху по центру, не перекрывая лица)
@@ -941,9 +948,10 @@
       { id: 's-surprises', frame: 146, hold: 2000 },          // 9. 147: Будут сюрпризы! (кадр семьи на 2 секунды)
       { id: 's-remember', frame: 155, hold: 1300 },           // 10. 152-159: Этот вечер ты запомнишь на долго!
       { id: 's-wait', frame: 171, hold: 1200 },               // 11. 167-176: Жду тебя!
-      { id: 's-lets-go', frame: 217, hold: 1200 },            // 12. 183-190 (+31 = 217): Поехали! (затем полет)
-      { id: 's-repeat', frame: 285, hold: 1600 },             // 13. 251-259 (+31 = 285): 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
-      { id: 's-confirm-cta', frame: 296, hold: 3500 }         // 14. 265 (+31 = 296): Пожалуйста подтвердите свое участие в анкете!
+      { id: 's-gallop', frame: 207, hold: 1300 },             // 12. 179-209 (кадр 207): Скачем на всех порах!
+      { id: 's-lets-go', frame: 217, hold: 1200 },            // 13. 214-221 (+31 = 217): Поехали! (затем полет)
+      { id: 's-repeat', frame: 285, hold: 1600 },             // 14. 251-259 (+31 = 285): 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
+      { id: 's-confirm-cta', frame: 296, hold: 3500 }         // 15. 265 (+31 = 296): Пожалуйста подтвердите свое участие в анкете!
     ];
 
     const scenes = scenesConfig.map((s, idx) => ({ ...s, index: idx, el: document.getElementById(s.id) }));
