@@ -767,10 +767,10 @@
         </div>
       </div>
 
-      <!-- 12. 179-209 (кадр 207): Скачем на всех порах! -->
+      <!-- 12. 185-202: Поскачем на всех порах! -->
       <div class="hero-text align-center" id="s-gallop">
         <div class="hero-huge-title" style="font-size: clamp(1.8rem, 4.6vh, 3.2rem); line-height: 1.16;">
-          Скачем на всех порах! 🐎
+          Поскачем на всех порах! 🐎
         </div>
       </div>
 
@@ -935,23 +935,38 @@
       viewModeBtn.style.display = 'none';
     }
 
-    // 15 Scenes strictly aligned with user specifications (unified for mobile and desktop)
+    // 15 Scenes strictly calibrated to user specifications:
+    // 1. 1-34: Приглашаю Вас на свой юбилей! 30
+    // 2. 40-49: 12.12
+    // 3. 57-65: Незабываемый вечер
+    // 4. 71-81: Время начала 16.00
+    // 5. 88-97: Санкт-Петербург
+    // 6. 104-112: Кожевенная линия, 34
+    // 7. 119-128: Осталось "таймер" (не в квадратах)
+    // 8. 134-143: Не пропусти!
+    // 9. 147: Будут сюрпризы! (кадр семьи на 2 секунды)
+    // 10. 152-159: Этот вечер ты запомнишь на долго!
+    // 11. 167-176: Жду тебя!
+    // 12. 185-202: Поскачем на всех порах!
+    // 13. 214-222: Поехали! (затем долгий полет 223-282)
+    // 14. 283-295: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
+    // 15. Последний кадр (296): Пожалуйста подтвердите свое участие в анкете!
     const scenesConfig = [
-      { id: 's-anniversary', frame: 28, hold: 1600 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
-      { id: 's-date', frame: 44, hold: 1200 },                // 2. 40-49: 12.12 (вверху по центру, не перекрывая лица)
-      { id: 's-unforgettable', frame: 60, hold: 1200 },       // 3. 57-65: Незабываемый вечер
-      { id: 's-time', frame: 75, hold: 1200 },                // 4. 71-81: Время начала 16.00
+      { id: 's-anniversary', frame: 20, hold: 1600 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
+      { id: 's-date', frame: 45, hold: 1200 },                // 2. 40-49: 12.12 (вверху по центру, не перекрывая лица)
+      { id: 's-unforgettable', frame: 61, hold: 1200 },       // 3. 57-65: Незабываемый вечер
+      { id: 's-time', frame: 76, hold: 1200 },                // 4. 71-81: Время начала 16.00
       { id: 's-city', frame: 92, hold: 1200 },                // 5. 88-97: Санкт-Петербург
-      { id: 's-address', frame: 107, hold: 1200 },            // 6. 104-112: Кожевенная линия, 34
+      { id: 's-address', frame: 108, hold: 1200 },            // 6. 104-112: Кожевенная линия, 34
       { id: 's-timer', frame: 123, hold: 1600 },              // 7. 119-128: Осталось "таймер" (не в квадратах)
       { id: 's-dont-miss', frame: 138, hold: 1200 },          // 8. 134-143: Не пропусти!
-      { id: 's-surprises', frame: 146, hold: 2000 },          // 9. 147: Будут сюрпризы! (кадр семьи на 2 секунды)
+      { id: 's-surprises', frame: 147, hold: 2000 },          // 9. 147: Будут сюрпризы! (кадр семьи на 2 секунды)
       { id: 's-remember', frame: 155, hold: 1300 },           // 10. 152-159: Этот вечер ты запомнишь на долго!
       { id: 's-wait', frame: 171, hold: 1200 },               // 11. 167-176: Жду тебя!
-      { id: 's-gallop', frame: 207, hold: 1300 },             // 12. 179-209 (кадр 207): Скачем на всех порах!
-      { id: 's-lets-go', frame: 217, hold: 1200 },            // 13. 214-221 (+31 = 217): Поехали! (затем полет)
-      { id: 's-repeat', frame: 285, hold: 1600 },             // 14. 251-259 (+31 = 285): 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
-      { id: 's-confirm-cta', frame: 296, hold: 3500 }         // 15. 265 (+31 = 296): Пожалуйста подтвердите свое участие в анкете!
+      { id: 's-gallop', frame: 193, hold: 1300 },             // 12. 185-202: Поскачем на всех порах!
+      { id: 's-lets-go', frame: 218, hold: 1200 },            // 13. 214-222: Поехали! (затем долгий полет 223-282)
+      { id: 's-repeat', frame: 289, hold: 1600 },             // 14. 283-295: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
+      { id: 's-confirm-cta', frame: 296, hold: 3500 }         // 15. Последний кадр: Пожалуйста подтвердите свое участие в анкете!
     ];
 
     const scenes = scenesConfig.map((s, idx) => ({ ...s, index: idx, el: document.getElementById(s.id) }));
@@ -1284,8 +1299,8 @@
             if (i > 0 && scenes[i - 1].el) scenes[i - 1].el.classList.remove('active');
 
             const frameDelta = Math.abs(targetFrame - currentF);
-            // Smooth natural duration based on frame distance (0.75s for regular transitions, ~1.9s for long flight 195-251)
-            const transDuration = Math.min(2600, Math.max(750, frameDelta * 28));
+            // Snappy duration for close scene transitions (~390ms) so transition frames like 116 pass cleanly; smooth ~2s for flight 223-282
+            const transDuration = Math.min(2600, Math.max(380, frameDelta * 26));
             await animateFrames(currentF, targetFrame, transDuration, signal);
           } else {
             currentF = targetFrame;
