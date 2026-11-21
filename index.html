@@ -952,20 +952,20 @@
     // 14. 283-295: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
     // 15. Последний кадр (296): Пожалуйста подтвердите свое участие в анкете!
     const scenesConfig = [
-      { id: 's-anniversary', frame: 20, hold: 1800 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
+      { id: 's-anniversary', frame: 20, hold: 1400 },         // 1. 1-34: 30 с анимацией Приглашаю Вас на свой юбилей!
       { id: 's-date', frame: 45, hold: 1400 },                // 2. 40-49: 12.12 (вверху по центру, не перекрывая лица)
       { id: 's-unforgettable', frame: 61, hold: 1400 },       // 3. 57-65: Незабываемый вечер
       { id: 's-time', frame: 76, hold: 1400 },                // 4. 71-81: Время начала 16.00
       { id: 's-city', frame: 92, hold: 1400 },                // 5. 88-97: Санкт-Петербург
-      { id: 's-address', frame: 108, hold: 1500 },            // 6. 104-112: Кожевенная линия, 34
-      { id: 's-timer', frame: 123, hold: 1800 },              // 7. 119-128: Осталось "таймер" (не в квадратах)
+      { id: 's-address', frame: 108, hold: 1400 },            // 6. 104-112: Кожевенная линия, 34
+      { id: 's-timer', frame: 123, hold: 1500 },              // 7. 119-128: Осталось "таймер" (не в квадратах)
       { id: 's-dont-miss', frame: 138, hold: 1400 },          // 8. 134-143: Не пропусти!
-      { id: 's-surprises', frame: 147, hold: 2200 },          // 9. 147: Будут сюрпризы! (кадр семьи на 2.2 секунды)
-      { id: 's-remember', frame: 155, hold: 1500 },           // 10. 152-159: Этот вечер ты запомнишь на долго!
+      { id: 's-surprises', frame: 147, hold: 1500 },          // 9. 147: Будут сюрпризы! (кадр семьи 147)
+      { id: 's-remember', frame: 155, hold: 1400 },           // 10. 152-159: Этот вечер ты запомнишь на долго!
       { id: 's-wait', frame: 171, hold: 1400 },               // 11. 167-176: Жду тебя!
-      { id: 's-gallop', frame: 185, endFrame: 202, hold: 2600 }, // 12. 185-202: Поскачем на всех порах! (плавное видео пары 2.6 сек)
+      { id: 's-gallop', frame: 185, endFrame: 202, hold: 1400 }, // 12. 185-202: Поскачем на всех порах! (одинаковая длительность со всеми сценами: 1.4 сек)
       { id: 's-lets-go', frame: 218, hold: 1400 },            // 13. 214-222: Поехали! (затем долгий полет 223-282)
-      { id: 's-repeat', frame: 289, hold: 1800 },             // 14. 283-295: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
+      { id: 's-repeat', frame: 289, hold: 1500 },             // 14. 283-295: 12.12. 16.00 Санкт-Петербург, Кожевенная линия, 34
       { id: 's-confirm-cta', frame: 296, hold: 3500 }         // 15. Последний кадр: Пожалуйста подтвердите свое участие в анкете!
     ];
 
@@ -977,8 +977,8 @@
     // View Mode: on mobile default to 'cover' (fills 100% of 9:16 screen), on desktop 'fit' with ambient glow
     let viewMode = isMobile ? 'cover' : 'fit';
 
-    // Playback state
-    let currentF = 0;       // Float current frame index (0..256)
+    // Playback state (1-based frame index 1 .. TOTAL)
+    let currentF = 1;
     let currentSceneIdx = 0;
     let isPlaying = false;
     let isPaused = false;
@@ -1101,10 +1101,11 @@
 
     // ── High Quality Frame Drawing (Fit + Ambient Glow OR Cover) ──
     function drawParallaxFrame(fFloat) {
-      const fi = Math.min(Math.max(fFloat, 0), TOTAL - 1);
-      const baseIdx = Math.floor(fi);
+      // fFloat is 1-based frame index (1 .. TOTAL) matching frame_001.webp .. frame_297.webp
+      const fi = Math.min(Math.max(fFloat, 1), TOTAL);
+      const baseIdx = Math.floor(fi) - 1; // 0-based array index (0 .. TOTAL - 1)
       const nextIdx = Math.min(baseIdx + 1, TOTAL - 1);
-      const alpha = fi - baseIdx;
+      const alpha = (fi - 1) - baseIdx;
 
       const img1 = frames[baseIdx];
       if (!img1 || !img1.naturalWidth) return;
@@ -1532,8 +1533,8 @@
       ready = true;
 
       // Render initial frame (Frame 1)
-      currentF = 0;
-      drawParallaxFrame(0);
+      currentF = 1;
+      drawParallaxFrame(1);
       showSceneText(0);
 
       cd();
