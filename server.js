@@ -149,6 +149,14 @@ app.use('/mobile_frames', express.static(path.join(__dirname, 'mobile_frames'), 
   immutable: true
 }));
 
+// Never cache index.html so client code and asset version strings are always immediately fresh
+app.get(['/', '/index.html'], (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Serve index and static assets
 app.use(express.static(__dirname));
 
